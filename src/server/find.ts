@@ -7,6 +7,7 @@ import { parseName } from "../lib/email/names"
 import { patternById } from "../lib/email/patterns"
 import { getStore } from "./db"
 import { mailStatus } from "./mx"
+import { logLookups } from "./usage"
 
 export interface FindQuery {
   domain: string
@@ -70,5 +71,8 @@ async function findOne(query: FindQuery, limit: number): Promise<FindResult> {
 
 /** Answers a batch of lookups. Each query is independent; a bad one never fails the rest. */
 export async function findEmails(queries: readonly FindQuery[], limit = 5): Promise<FindResult[]> {
-  return Promise.all(queries.slice(0, MAX_BATCH).map((q) => findOne(q, limit)))
+  const asked = queries.slice(0, MAX_BATCH)
+  const results = await Promise.all(asked.map((q) => findOne(q, limit)))
+  logLookups(asked.map((query, i) => ({ query, result: results[i] })))
+  return results
 }

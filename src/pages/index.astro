@@ -1,5 +1,12 @@
 ---
+import { PAGE_CACHE } from "@/lib/routes"
 import HomeView from "@/views/HomeView.astro"
+
+// Server-rendered, not prerendered: prerendered files are served before the middleware runs,
+// so home page visits would be missing from the usage log.
+export const prerender = false
+
+Astro.response.headers.set("Cache-Control", PAGE_CACHE)
 ---
 
 <HomeView locale="en" />

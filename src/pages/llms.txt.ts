@@ -1,5 +1,8 @@
 import type { APIRoute } from "astro"
 
+// Not prerendered, so the usage log sees AI agents fetching it.
+export const prerender = false
+
 export const GET: APIRoute = ({ site }) => {
   const origin = site!.origin
   return new Response(

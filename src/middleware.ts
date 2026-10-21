@@ -1,5 +1,10 @@
+import { randomBytes } from "node:crypto"
 import { defineMiddleware } from "astro:middleware"
+import type { APIContext, MiddlewareNext } from "astro"
 import { take, type Bucket, type Limit } from "./lib/rate-limit"
+import { classifyPath } from "./lib/usage"
+import { runWithRequest } from "./server/request-context"
+import { logRequest } from "./server/usage"
 
 // Per-IP limit for the API and MCP endpoint. In-memory, so it is per process;
 // enough for one server, move to a shared store if the app ever scales out.
@@ -19,13 +24,21 @@ function isMachineRoute(pathname: string): boolean {
   return pathname.startsWith("/api/v1/") || pathname === "/mcp"
 }
 
-export const onRequest = defineMiddleware(async (context, next) => {
+function clientIp(context: APIContext): string {
+  const forwarded = TRUST_PROXY ? context.request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() : undefined
+  try {
+    return forwarded || context.clientAddress
+  } catch {
+    return "unknown"
+  }
+}
+
+/** Rate limits and CORS for the API and MCP; every other route passes straight through. */
+async function serve(context: APIContext, next: MiddlewareNext, ip: string): Promise<Response> {
   const { pathname } = context.url
   if (!isMachineRoute(pathname)) return next()
   if (context.request.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS })
 
-  const forwarded = TRUST_PROXY ? context.request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() : undefined
-  const ip = forwarded || context.clientAddress
   const decision = take(buckets.get(ip), Date.now(), LIMIT)
   if (buckets.size >= MAX_TRACKED && !buckets.has(ip)) buckets.delete(buckets.keys().next().value!)
   buckets.set(ip, decision.bucket)
@@ -40,4 +53,31 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const response = await next()
   for (const [key, value] of Object.entries(CORS)) response.headers.set(key, value)
   return response
+}
+
+export const onRequest = defineMiddleware(async (context, next) => {
+  const surface = classifyPath(context.url.pathname).surface
+  if (surface === "asset") return next()
+
+  const ip = clientIp(context)
+  const started = performance.now()
+  return runWithRequest(randomBytes(8).toString("hex"), surface, async (request) => {
+    let status = 500
+    try {
+      const response = await serve(context, next, ip)
+      status = response.status
+      return response
+    } finally {
+      logRequest({
+        request,
+        method: context.request.method,
+        url: context.url,
+        status,
+        ms: performance.now() - started,
+        ip,
+        userAgent: context.request.headers.get("user-agent"),
+        referer: context.request.headers.get("referer"),
+      })
+    }
+  })
 })
