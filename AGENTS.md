@@ -37,7 +37,8 @@ company's email format and the likely address. Same answers over a REST API and 
 
 ## Usage data
 
-Requests and lookups are appended to `$DATA_DIR/usage/*.jsonl` and read with DuckDB; see [docs/usage-data.md](docs/usage-data.md).
+Requests and lookups are appended to `$DATA_DIR/usage/*.jsonl` (JSON Lines, one file per kind and UTC day).
+The tooling to query them lives on the server, not in this public repo.
 Event building is pure (`src/lib/usage.ts`), writing is `src/server/usage-log.ts`. Never put a query string, a person's name
 or a raw IP in an event. Routes must be server-rendered (`prerender = false`) or the middleware, and so the log, never sees them.
 

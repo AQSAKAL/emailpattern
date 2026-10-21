@@ -3,7 +3,7 @@ import { appendFile, mkdir } from "node:fs/promises"
 import { resolve } from "node:path"
 import type { LookupEvent, RequestEvent } from "../lib/usage"
 
-// Append-only JSON Lines, one file per kind and UTC day, so DuckDB can read the lot with a glob:
+// Append-only JSON Lines, one file per kind and UTC day, so any JSON Lines reader can take them all with one glob:
 //   requests-2026-10-21.jsonl, lookups-2026-10-21.jsonl
 
 type Kind = "requests" | "lookups"
