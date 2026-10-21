@@ -27,6 +27,7 @@ Answers are inferred from each company's format, with a confidence between 0 and
 ## CLI
 
 - pip install emailpattern (Python SDK: emailpattern.find(name, domain), Client, AsyncClient; and the CLI)
+- npm install -g @emailpattern/cli (the same command line for Node; npx @emailpattern/cli)
 - emailpattern find "Jane Doe" acme.com · emailpattern domain acme.com · emailpattern bulk leads.csv
 
 ## Pages

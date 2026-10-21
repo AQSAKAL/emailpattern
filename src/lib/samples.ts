@@ -89,8 +89,12 @@ export function cliSamples(name: string): CodeSample[] {
     {
       id: "install",
       label: "Install",
-      code: `pipx install emailpattern     # or: uv tool install emailpattern
-uvx emailpattern find "${name}" acme.com   # without installing`,
+      code: `pipx install emailpattern            # Python, also the SDK
+npm install -g @emailpattern/cli      # Node
+
+# or run once without installing
+uvx emailpattern find "${name}" acme.com
+npx @emailpattern/cli find "${name}" acme.com`,
     },
     {
       id: "find",
