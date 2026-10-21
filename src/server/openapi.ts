@@ -18,6 +18,11 @@ const FindResult = {
     error: { type: ["string", "null"], enum: ["invalid_domain", "invalid_name", null] },
     company_name: { type: ["string", "null"] },
     known_domain: { type: "boolean", description: "False when the ranking is the global default because we have no data for the domain." },
+    prior_basis: {
+      type: "string",
+      enum: ["mail_host", "overall", "catalogue"],
+      description: "What the ranking starts from before the company's own addresses: formats at companies on the same mail host, across all known companies, or built-in defaults.",
+    },
     sample_count: { type: "integer" },
     candidates: { type: "array", items: Candidate },
     mail: {

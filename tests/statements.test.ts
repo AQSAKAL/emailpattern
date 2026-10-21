@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest"
 import { isFreeMail } from "../src/lib/email/free-mail"
 import { describedPattern, parseStatement } from "../src/lib/email/statements"
-import { collectEvidence, domainWeights } from "../src/server/import-samples"
+import { collectEvidence, domainWeights, mergeWeights } from "../src/server/import-samples"
+import { parseMailHostLine } from "../src/server/mail-hosts"
 
 describe("describedPattern", () => {
   it.each([
@@ -85,5 +86,25 @@ describe("collectEvidence and domainWeights", () => {
   it("caps a statement's weight", () => {
     const { byDomain } = collectEvidence([{ statement: "first@x.com", weight: 40 }])
     expect(domainWeights("x.com", byDomain.get("x.com")!).patterns).toEqual([{ patternId: "first", weight: 5 }])
+  })
+})
+
+describe("mergeWeights", () => {
+  it("adds new evidence to what a domain already has", () => {
+    const merged = mergeWeights(
+      { patterns: [{ patternId: "first", weight: 3 }], sampleCount: 3 },
+      { patterns: [{ patternId: "first", weight: 1 }, { patternId: "flast", weight: 5 }], sampleCount: 6 },
+    )
+    expect(merged).toEqual({ patterns: [{ patternId: "flast", weight: 5 }, { patternId: "first", weight: 4 }], sampleCount: 9 })
+    expect(mergeWeights(null, { patterns: [], sampleCount: 0 })).toEqual({ patterns: [], sampleCount: 0 })
+  })
+})
+
+describe("parseMailHostLine", () => {
+  it("reads lookup lines and skips bad ones", () => {
+    expect(parseMailHostLine('{"domain":"Acme.com","accepts_mail":true,"mx":["x"],"host":"Microsoft 365"}')).toEqual({ domain: "acme.com", acceptsMail: true, host: "Microsoft 365" })
+    expect(parseMailHostLine('{"domain":"x.com","accepts_mail":null,"mx":[],"host":null}')).toEqual({ domain: "x.com", acceptsMail: null, host: null })
+    expect(parseMailHostLine("not json")).toBeNull()
+    expect(parseMailHostLine('{"domain":"nope"}')).toBeNull()
   })
 })

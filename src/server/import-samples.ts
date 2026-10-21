@@ -4,6 +4,7 @@ import { normalizeDomain } from "../lib/email/domains"
 import { isFreeMail } from "../lib/email/free-mail"
 import { inferDomainPatterns, type Sample } from "../lib/email/infer"
 import { parseStatement } from "../lib/email/statements"
+import type { PatternWeight } from "../lib/email/candidates"
 import type { Store } from "./store"
 
 /**
@@ -84,12 +85,27 @@ async function* readLines(path: string): AsyncGenerator<ImportLine> {
   for await (const line of lines) if (line.trim()) yield JSON.parse(line) as ImportLine
 }
 
+/** A domain's new weights added to what the store already holds for it. Pure. */
+export function mergeWeights(
+  existing: { patterns: PatternWeight[]; sampleCount: number } | null,
+  added: { patterns: PatternWeight[]; sampleCount: number },
+): { patterns: PatternWeight[]; sampleCount: number } {
+  if (!existing) return added
+  const weights = new Map(existing.patterns.map((p) => [p.patternId, p.weight]))
+  for (const p of added.patterns) weights.set(p.patternId, (weights.get(p.patternId) ?? 0) + p.weight)
+  return {
+    patterns: [...weights].map(([patternId, weight]) => ({ patternId, weight })).sort((a, b) => b.weight - a.weight),
+    sampleCount: existing.sampleCount + added.sampleCount,
+  }
+}
+
 /**
  * Reads JSON Lines of people with published addresses and/or format statements, learns each
  * domain's formats and writes them to the store. Only pattern weights are kept, never names
- * or addresses.
+ * or addresses. By default a domain's new evidence is added to what the store already has
+ * (importing the same file twice counts it twice); `replace` overwrites instead.
  */
-export async function importSamples(store: Store, path: string): Promise<ImportCounts> {
+export async function importSamples(store: Store, path: string, { replace = false } = {}): Promise<ImportCounts> {
   const all: ImportLine[] = []
   for await (const line of readLines(path)) all.push(line)
   const { byDomain, counts } = collectEvidence(all)
@@ -97,8 +113,9 @@ export async function importSamples(store: Store, path: string): Promise<ImportC
   const updatedAt = new Date().toISOString()
   let domains = 0
   for (const [domain, evidence] of byDomain) {
-    const { patterns, sampleCount } = domainWeights(domain, evidence)
-    if (patterns.length === 0) continue
+    const added = domainWeights(domain, evidence)
+    if (added.patterns.length === 0) continue
+    const { patterns, sampleCount } = replace ? added : mergeWeights(store.getDomain(domain), added)
     store.upsertDomain({ domain, companyName: evidence.company, sampleCount, patterns, updatedAt })
     domains++
   }

@@ -1,4 +1,5 @@
 import { PATTERNS, applyTemplate, patternById, type NameParts } from "./patterns"
+import { CATALOGUE_PRIOR, type Prior } from "./priors"
 
 /** How many people at a domain were seen using a pattern (fractional when ambiguous). */
 export interface PatternWeight {
@@ -14,16 +15,16 @@ export interface Candidate {
   confidence: number
 }
 
-// How many observations the global prior is worth. Low, so a handful of real
-// samples from a domain outweighs the guess.
+// How many observations the prior is worth. Low, so a handful of real samples from a
+// domain outweighs the guess.
 const PRIOR_STRENGTH = 2
 
-/** Pattern shares for a domain: observations smoothed towards the global prior. */
-export function patternShares(observed: readonly PatternWeight[]): Map<string, number> {
+/** Pattern shares for a domain: observations smoothed towards a prior (see priors.ts). */
+export function patternShares(observed: readonly PatternWeight[], prior: Prior = CATALOGUE_PRIOR): Map<string, number> {
   const seen = new Map(observed.map((o) => [o.patternId, o.weight]))
   const total = observed.reduce((sum, o) => sum + o.weight, 0)
   return new Map(
-    PATTERNS.map((p) => [p.id, ((seen.get(p.id) ?? 0) + PRIOR_STRENGTH * p.prior) / (total + PRIOR_STRENGTH)]),
+    PATTERNS.map((p) => [p.id, ((seen.get(p.id) ?? 0) + PRIOR_STRENGTH * (prior.get(p.id) ?? 0)) / (total + PRIOR_STRENGTH)]),
   )
 }
 
@@ -36,8 +37,9 @@ export function rankCandidates(
   domain: string,
   observed: readonly PatternWeight[],
   limit = 5,
+  prior: Prior = CATALOGUE_PRIOR,
 ): Candidate[] {
-  const shares = patternShares(observed)
+  const shares = patternShares(observed, prior)
   const byEmail = new Map<string, Candidate>()
   const formats: Candidate[] = []
 

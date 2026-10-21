@@ -163,7 +163,9 @@ function Result({
         <p className="max-w-2xl text-sm text-muted-foreground">
           {result.known_domain
             ? fill(t.knownShare, { share: share(top.confidence), domain })
-            : fill(t.unknownDomain, { domain })}
+            : result.prior_basis === "mail_host" && result.mail.host
+              ? fill(t.unknownDomainHost, { domain, host: result.mail.host })
+              : fill(t.unknownDomain, { domain })}
           {!top.email && ` ${t.addName}`}
         </p>
         <MailLine result={result} t={t} />

@@ -8,11 +8,11 @@ import LinkButton from "@/components/site/LinkButton.astro"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { LOCALES, dictionary, fill, splitPlaceholders, formatNumber, formatPercent, localePath, type Locale } from "@/i18n"
 import Base from "@/layouts/Base.astro"
-import { rankCandidates } from "@/lib/email/candidates"
 import { parseName } from "@/lib/email/names"
 import { applyTemplate, patternById, renameTokens } from "@/lib/email/patterns"
 import { INDEXABLE_MIN_SAMPLES, getStore } from "@/server/db"
-import { mailStatus } from "@/server/mx"
+import { domainContext } from "@/server/find"
+import { rankCandidates } from "@/lib/email/candidates"
 
 interface Props {
   locale: Locale
@@ -22,12 +22,13 @@ interface Props {
 const { locale, domain } = Astro.props
 const t = dictionary(locale)
 const store = await getStore()
-const [record, mail] = await Promise.all([Promise.resolve(store.getDomain(domain)), mailStatus(domain)])
+const { record, mail, prior, basis } = await domainContext(domain)
 
 const known = Boolean(record && record.sampleCount > 0)
+const byHost = !known && basis === "mail_host" && Boolean(mail.host)
 const company = record?.companyName ?? domain
 const person = parseName(t.examplePerson.name)!
-const formats = rankCandidates(null, domain, record?.patterns ?? [], 8)
+const formats = rankCandidates(null, domain, record?.patterns ?? [], 8, prior)
 const top = formats[0]
 const topTemplate = patternById(top.patternId)!.template
 const example = `${applyTemplate(topTemplate, person)}@${domain}`
@@ -101,13 +102,15 @@ const jsonLd = [
             : <strong class="font-semibold text-token-first">{example}</strong>,
           )
         ) : (
-          <span class="text-muted-foreground">{fill(t.domain.leadUnknown, { domain })}</span>
+          <span class="text-muted-foreground">
+            {byHost ? fill(t.domain.leadUnknownHost, { domain, host: mail.host! }) : fill(t.domain.leadUnknown, { domain })}
+          </span>
         )}
       </p>
     </section>
 
     <section class="flex flex-col gap-6">
-      <SectionHeading title={known ? fill(t.domain.distributionTitle, { domain }) : t.domain.defaultsTitle} />
+      <SectionHeading title={known ? fill(t.domain.distributionTitle, { domain }) : byHost ? fill(t.domain.defaultsTitleHost, { host: mail.host! }) : t.domain.defaultsTitle} />
       <Table>
         <TableHeader>
           <TableRow>

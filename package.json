@@ -14,7 +14,8 @@
     "test": "vitest run",
     "check": "astro check && tsc --noEmit",
     "import": "tsx scripts/import.ts",
-    "astro": "astro"
+    "astro": "astro",
+    "import-mx": "tsx scripts/import-mx.ts"
   },
   "dependencies": {
     "@astrojs/node": "^11.1.9",
