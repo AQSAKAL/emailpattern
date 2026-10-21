@@ -1,0 +1,12 @@
+---
+import { DEFAULT_LOCALE } from "@/i18n"
+import { PAGE_CACHE } from "@/lib/routes"
+import PatternsView from "@/views/PatternsView.astro"
+
+export const prerender = false
+
+const locale = DEFAULT_LOCALE
+Astro.response.headers.set("Cache-Control", PAGE_CACHE)
+---
+
+<PatternsView locale={locale} />

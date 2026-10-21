@@ -1,0 +1,50 @@
+---
+import { AddressFormat } from "@/components/AddressFormat"
+import SectionHeading from "@/components/site/SectionHeading.astro"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { dictionary, formatNumber, localePath, patternLabel, type Locale } from "@/i18n"
+import Base from "@/layouts/Base.astro"
+import { parseName } from "@/lib/email/names"
+import { PATTERNS, applyTemplate } from "@/lib/email/patterns"
+import { getStore } from "@/server/db"
+
+interface Props {
+  locale: Locale
+}
+
+const { locale } = Astro.props
+const t = dictionary(locale)
+const counts = (await getStore()).primaryPatternCounts()
+const person = parseName(t.examplePerson.name)!
+---
+
+<Base locale={locale} title={t.patterns.metaTitle} description={t.patterns.metaDescription} path="/patterns">
+  <div class="mx-auto flex max-w-6xl flex-col gap-10 px-4 pt-16 sm:px-6">
+    <SectionHeading as="h1" title={t.patterns.title} />
+    <p class="max-w-2xl text-sm text-muted-foreground">{t.patterns.lead}</p>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>{t.patterns.colFormat}</TableHead>
+          <TableHead className="hidden md:table-cell" />
+          <TableHead className="hidden sm:table-cell">{t.patterns.colExample}</TableHead>
+          <TableHead className="text-right">{t.patterns.colCompanies}</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {PATTERNS.map((p) => (
+          <TableRow>
+            <TableCell className="py-4">
+              <a href={localePath(locale, `/patterns/${p.id}`)} class="text-base hover:underline">
+                <AddressFormat template={p.template} labels={t.tokens} />
+              </a>
+            </TableCell>
+            <TableCell className="hidden text-muted-foreground md:table-cell">{patternLabel(t, p.id)}</TableCell>
+            <TableCell className="hidden sm:table-cell">{applyTemplate(p.template, person)}@acme.com</TableCell>
+            <TableCell className="text-right tabular-nums">{formatNumber(locale, counts.get(p.id) ?? 0)}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  </div>
+</Base>

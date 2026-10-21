@@ -1,0 +1,88 @@
+---
+import { AddressFormat } from "@/components/AddressFormat"
+import SectionHeading from "@/components/site/SectionHeading.astro"
+import LinkButton from "@/components/site/LinkButton.astro"
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
+import { dictionary, fill, formatNumber, localePath, patternLabel, type Locale } from "@/i18n"
+import Base from "@/layouts/Base.astro"
+import { parseName } from "@/lib/email/names"
+import { PATTERNS, applyTemplate, renameTokens, spreadsheetFormula, type Pattern } from "@/lib/email/patterns"
+import { getStore } from "@/server/db"
+
+interface Props {
+  locale: Locale
+  pattern: Pattern
+}
+
+const { locale, pattern } = Astro.props
+const t = dictionary(locale)
+const store = await getStore()
+const companies = store.domainsUsingPattern(pattern.id, 60)
+const count = store.primaryPatternCounts().get(pattern.id) ?? 0
+const label = patternLabel(t, pattern.id)
+const template = pattern.template
+const localTemplate = renameTokens(template, t.tokens)
+const examples = t.samplePeople
+  .map((name) => ({ name, local: parseName(name) && applyTemplate(template, parseName(name)!) }))
+  .filter((e) => e.local)
+---
+
+<Base
+  locale={locale}
+  title={fill(t.pattern.metaTitle, { template: localTemplate })}
+  description={fill(t.pattern.metaDescription, { template: localTemplate, label })}
+  path={`/patterns/${pattern.id}`}
+>
+  <div class="mx-auto flex max-w-6xl flex-col gap-20 px-4 pt-16 sm:px-6">
+    <section class="flex flex-col gap-6">
+      <p class="text-sm font-semibold text-primary">{t.nav.patterns}</p>
+      <h1 class="text-3xl font-semibold tracking-tight sm:text-5xl">
+        <AddressFormat template={template} domain="acme.com" labels={t.tokens} className="break-all whitespace-normal" />
+      </h1>
+      <p class="max-w-2xl text-lg text-muted-foreground">{fill(t.pattern.lead, { label })}</p>
+    </section>
+
+    <section class="flex flex-col gap-6">
+      <SectionHeading title={t.pattern.examplesTitle} />
+      <Table>
+        <TableBody>
+          {examples.map((e) => (
+            <TableRow>
+              <TableCell className="py-3 text-muted-foreground">{e.name}</TableCell>
+              <TableCell className="text-right sm:text-sm">{e.local}@acme.com</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </section>
+
+    <section class="flex flex-col gap-6">
+      <SectionHeading title={t.pattern.formulaTitle} />
+      <p class="text-sm text-muted-foreground">{t.pattern.formulaLead}</p>
+      <pre class="overflow-x-auto rounded-lg bg-[oklch(0.21_0.03_264)] p-5 font-mono text-sm text-[oklch(0.93_0.01_255)]"><code>{spreadsheetFormula(template)}</code></pre>
+    </section>
+
+    {companies.length > 0 && (
+      <section class="flex flex-col gap-6">
+        <SectionHeading title={fill(t.pattern.companiesTitle, { template: localTemplate })} />
+        <p class="text-sm text-muted-foreground">{fill(t.pattern.companiesCount, { count: formatNumber(locale, count) })}</p>
+        <div class="flex flex-wrap gap-1">
+          {companies.map((c) => (
+            <LinkButton variant="outline" size="sm" href={localePath(locale, `/${c.domain}`)}>{c.domain}</LinkButton>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <section class="flex flex-col gap-6">
+      <SectionHeading title={t.pattern.otherTitle} />
+      <div class="flex flex-wrap gap-x-6 gap-y-3">
+        {PATTERNS.filter((p) => p.id !== pattern.id).map((p) => (
+          <a href={localePath(locale, `/patterns/${p.id}`)} class="text-sm hover:underline">
+            <AddressFormat template={p.template} labels={t.tokens} />
+          </a>
+        ))}
+      </div>
+    </section>
+  </div>
+</Base>

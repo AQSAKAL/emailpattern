@@ -1,0 +1,12 @@
+www.emailpattern.com {
+	redir https://emailpattern.com{uri} permanent
+}
+
+emailpattern.com {
+	encode zstd gzip
+
+	@assets path /_astro/*
+	header @assets Cache-Control "public, max-age=31536000, immutable"
+
+	reverse_proxy app:4321
+}

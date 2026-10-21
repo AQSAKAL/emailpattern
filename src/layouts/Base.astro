@@ -1,0 +1,60 @@
+---
+import "@/styles/global.css"
+import Footer from "@/components/site/Footer.astro"
+import Header from "@/components/site/Header.astro"
+import { DEFAULT_LOCALE, LOCALES, LOCALE_CODES, localePath, type Locale } from "@/i18n"
+
+interface Props {
+  locale: Locale
+  title: string
+  description: string
+  /** The page's path without a language prefix, e.g. "/stripe.com". */
+  path: string
+  /** Thin pages (domains we know little about) stay out of the index. */
+  noindex?: boolean
+  jsonLd?: object[]
+}
+
+const { locale, title, description, path, noindex = false, jsonLd = [] } = Astro.props
+const site = Astro.site!
+const canonical = new URL(localePath(locale, path), site).href
+const alternates = LOCALE_CODES.map((code) => ({ code, href: new URL(localePath(code, path), site).href }))
+---
+
+<!doctype html>
+<html lang={LOCALES[locale].htmlLang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    {!noindex && alternates.map((a) => <link rel="alternate" hreflang={LOCALES[a.code].htmlLang} href={a.href} />)}
+    {!noindex && <link rel="alternate" hreflang="x-default" href={new URL(localePath(DEFAULT_LOCALE, path), site).href} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="EmailPattern" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={LOCALES[locale].ogLocale} />
+    <meta name="twitter:card" content="summary" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#11151f" media="(prefers-color-scheme: dark)" />
+    {jsonLd.map((data) => <script type="application/ld+json" set:html={JSON.stringify(data)} />)}
+    <script is:inline>
+      const dark = window.matchMedia("(prefers-color-scheme: dark)")
+      const apply = () => document.documentElement.classList.toggle("dark", dark.matches)
+      apply()
+      dark.addEventListener("change", apply)
+    </script>
+  </head>
+  <body class="min-h-dvh">
+    <Header locale={locale} path={path} />
+    <main>
+      <slot />
+    </main>
+    <Footer locale={locale} />
+  </body>
+</html>

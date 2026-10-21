@@ -1,0 +1,30 @@
+# One server: the app behind Caddy, which gets the TLS certificates itself.
+# If the box already runs a reverse proxy, drop the caddy service and point it at app:4321.
+services:
+  app:
+    build: .
+    image: emailpattern:latest
+    restart: unless-stopped
+    volumes:
+      - data:/data
+    expose:
+      - "4321"
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  data:
+  caddy_data:
+  caddy_config:

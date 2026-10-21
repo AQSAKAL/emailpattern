@@ -1,0 +1,71 @@
+---
+import LinkButton from "@/components/site/LinkButton.astro"
+import Wordmark from "@/components/site/Wordmark.astro"
+import { Separator } from "@/components/ui/separator"
+import { LOCALES, LOCALE_CODES, dictionary, localePath, type Locale } from "@/i18n"
+
+interface Props {
+  locale: Locale
+}
+
+const { locale } = Astro.props
+const t = dictionary(locale)
+const home = localePath(locale, "/")
+const letters = [..."abcdefghijklmnopqrstuvwxyz0123456789"]
+const columns = [
+  {
+    title: "EmailPattern",
+    links: [
+      { href: `${home}#find`, label: t.nav.find },
+      { href: localePath(locale, "/patterns"), label: t.footer.formats },
+    ],
+  },
+  {
+    title: t.nav.api,
+    links: [
+      { href: `${home}#api`, label: t.home.apiTitle },
+      { href: `${home}#mcp`, label: t.home.mcpTitle },
+      { href: "/api/openapi.json", label: t.footer.api },
+      { href: "/llms.txt", label: t.footer.llms },
+    ],
+  },
+]
+---
+
+<footer class="mt-24 border-t border-border bg-band">
+  <div class="mx-auto flex max-w-6xl flex-col gap-10 px-4 py-14 sm:px-6">
+    <div class="grid gap-10 md:grid-cols-[2fr_1fr_1fr]">
+      <div class="flex flex-col gap-3">
+        <Wordmark />
+        <p class="max-w-xs text-sm text-muted-foreground">{t.footer.tagline}</p>
+      </div>
+      {columns.map((col) => (
+        <div class="flex flex-col gap-3">
+          <p class="text-sm font-semibold">{col.title}</p>
+          <ul class="flex flex-col gap-2 text-sm">
+            {col.links.map((l) => (
+              <li><a class="text-muted-foreground hover:text-foreground" href={l.href}>{l.label}</a></li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+    <div class="flex flex-col gap-3">
+      <p class="text-sm font-semibold">{t.footer.browse}</p>
+      <div class="flex flex-wrap gap-0.5">
+        {letters.map((letter) => (
+          <LinkButton variant="ghost" size="icon-xs" class="text-muted-foreground uppercase" href={localePath(locale, `/browse/${letter}`)}>{letter}</LinkButton>
+        ))}
+      </div>
+    </div>
+    <Separator />
+    <div class="flex flex-wrap items-center justify-between gap-4 text-sm text-muted-foreground">
+      <p>© {new Date().getFullYear()} EmailPattern</p>
+      <div class="flex flex-wrap gap-4">
+        {LOCALE_CODES.map((code) => (
+          <a href={localePath(code, "/")} hreflang={code} class={code === locale ? "font-medium text-foreground" : "hover:text-foreground"}>{LOCALES[code].name}</a>
+        ))}
+      </div>
+    </div>
+  </div>
+</footer>

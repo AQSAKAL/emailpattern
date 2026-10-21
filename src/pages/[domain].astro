@@ -1,0 +1,17 @@
+---
+import { DEFAULT_LOCALE, localePath } from "@/i18n"
+import { PAGE_CACHE, prefixedLocale, resolveDomainParam } from "@/lib/routes"
+import DomainView from "@/views/DomainView.astro"
+import HomeView from "@/views/HomeView.astro"
+
+export const prerender = false
+
+// One segment is either a language's home page (/de) or an English domain page (/stripe.com).
+const locale = prefixedLocale(Astro.params.domain)
+const resolved = locale ? null : resolveDomainParam(Astro.params.domain)
+if (resolved?.kind === "not-found") return Astro.rewrite("/404")
+if (resolved?.kind === "redirect") return Astro.redirect(localePath(DEFAULT_LOCALE, `/${resolved.domain}`), 301)
+Astro.response.headers.set("Cache-Control", PAGE_CACHE)
+---
+
+{locale ? <HomeView locale={locale} /> : resolved?.kind === "ok" && <DomainView locale={DEFAULT_LOCALE} domain={resolved.domain} />}

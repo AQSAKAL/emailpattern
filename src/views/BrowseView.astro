@@ -1,0 +1,57 @@
+---
+import { AddressFormat } from "@/components/AddressFormat"
+import SectionHeading from "@/components/site/SectionHeading.astro"
+import LinkButton from "@/components/site/LinkButton.astro"
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
+import { dictionary, fill, localePath, type Locale } from "@/i18n"
+import Base from "@/layouts/Base.astro"
+import { patternById } from "@/lib/email/patterns"
+import { INDEXABLE_MIN_SAMPLES, getStore } from "@/server/db"
+
+interface Props {
+  locale: Locale
+  letter: string
+  after: string
+}
+
+const PAGE_SIZE = 200
+const { locale, letter, after } = Astro.props
+const t = dictionary(locale)
+const rows = (await getStore()).listDomains({ prefix: letter, after, limit: PAGE_SIZE, minSamples: INDEXABLE_MIN_SAMPLES })
+const next = rows.length === PAGE_SIZE ? rows[rows.length - 1].domain : null
+const label = letter.toUpperCase()
+---
+
+<Base
+  locale={locale}
+  title={fill(t.browse.metaTitle, { letter: label })}
+  description={t.site.description}
+  path={`/browse/${letter}`}
+  noindex={Boolean(after)}
+>
+  <div class="mx-auto flex max-w-6xl flex-col gap-8 px-4 pt-16 sm:px-6">
+    <SectionHeading as="h1" title={fill(t.browse.title, { letter: label })} />
+    {rows.length === 0 ? (
+      <p class="text-sm text-muted-foreground">{t.browse.empty}</p>
+    ) : (
+      <Table>
+        <TableBody>
+          {rows.map((r) => (
+            <TableRow>
+              <TableCell className="py-3">
+                <a href={localePath(locale, `/${r.domain}`)} class="text-sm hover:underline">{r.domain}</a>
+              </TableCell>
+              <TableCell className="hidden text-muted-foreground sm:table-cell">{r.companyName}</TableCell>
+              <TableCell className="text-right">
+                {r.primaryPattern && <AddressFormat template={patternById(r.primaryPattern)!.template} labels={t.tokens} />}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    )}
+    {next && (
+      <LinkButton variant="outline" class="self-start" href={`${localePath(locale, `/browse/${letter}`)}?after=${encodeURIComponent(next)}`}>{t.browse.next} →</LinkButton>
+    )}
+  </div>
+</Base>

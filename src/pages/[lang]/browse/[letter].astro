@@ -1,0 +1,13 @@
+---
+import { PAGE_CACHE, isBrowseLetter, prefixedLocale } from "@/lib/routes"
+import BrowseView from "@/views/BrowseView.astro"
+
+export const prerender = false
+
+const locale = prefixedLocale(Astro.params.lang)
+const letter = Astro.params.letter
+if (!locale || !isBrowseLetter(letter)) return Astro.rewrite("/404")
+Astro.response.headers.set("Cache-Control", PAGE_CACHE)
+---
+
+<BrowseView locale={locale} letter={letter} after={Astro.url.searchParams.get("after") ?? ""} />

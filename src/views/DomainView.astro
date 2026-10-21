@@ -1,0 +1,176 @@
+---
+import { AddressFormat } from "@/components/AddressFormat"
+import { Finder } from "@/components/Finder"
+import { LikelihoodBar } from "@/components/LikelihoodBar"
+import SectionHeading from "@/components/site/SectionHeading.astro"
+import LinkButton from "@/components/site/LinkButton.astro"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { LOCALES, dictionary, fill, splitPlaceholders, formatNumber, formatPercent, localePath, type Locale } from "@/i18n"
+import Base from "@/layouts/Base.astro"
+import { rankCandidates } from "@/lib/email/candidates"
+import { parseName } from "@/lib/email/names"
+import { applyTemplate, patternById, renameTokens } from "@/lib/email/patterns"
+import { INDEXABLE_MIN_SAMPLES, getStore } from "@/server/db"
+import { mailStatus } from "@/server/mx"
+
+interface Props {
+  locale: Locale
+  domain: string
+}
+
+const { locale, domain } = Astro.props
+const t = dictionary(locale)
+const store = await getStore()
+const [record, mail] = await Promise.all([Promise.resolve(store.getDomain(domain)), mailStatus(domain)])
+
+const known = Boolean(record && record.sampleCount > 0)
+const company = record?.companyName ?? domain
+const person = parseName(t.examplePerson.name)!
+const formats = rankCandidates(null, domain, record?.patterns ?? [], 8)
+const top = formats[0]
+const topTemplate = patternById(top.patternId)!.template
+const example = `${applyTemplate(topTemplate, person)}@${domain}`
+const templateText = `${renameTokens(topTemplate, t.tokens)}@${domain}`
+const share = formatPercent(locale, top.confidence)
+const related = known ? store.domainsUsingPattern(top.patternId, 12, domain) : []
+const path = `/${domain}`
+
+const title = known ? fill(t.domain.metaTitle, { domain, example }) : fill(t.domain.metaTitleUnknown, { domain })
+const description = known
+  ? fill(t.domain.metaDescription, { domain, company, template: templateText, share })
+  : fill(t.domain.metaDescriptionUnknown, { domain })
+
+const faq = [
+  ...(known
+    ? [{ q: fill(t.domain.faqFormatQ, { domain }), a: fill(t.domain.faqFormatA, { company, example, template: templateText, share }) }]
+    : []),
+  { q: fill(t.domain.faqFindQ, { domain }), a: fill(t.domain.faqFindA, { domain }) },
+  ...(mail.acceptsMail === null
+    ? []
+    : [{
+        q: fill(t.domain.faqMailQ, { domain }),
+        a: mail.acceptsMail
+          ? fill(t.domain.faqMailYes, { domain, host: mail.host ? ` (${mail.host})` : "" })
+          : fill(t.domain.faqMailNo, { domain }),
+      }]),
+]
+
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: t.domain.breadcrumbHome, item: new URL(localePath(locale, "/"), Astro.site).href },
+      { "@type": "ListItem", position: 2, name: domain, item: new URL(localePath(locale, path), Astro.site).href },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faq.map((item) => ({ "@type": "Question", name: item.q, acceptedAnswer: { "@type": "Answer", text: item.a } })),
+  },
+]
+---
+
+<Base
+  locale={locale}
+  title={title}
+  description={description}
+  path={path}
+  noindex={!record || record.sampleCount < INDEXABLE_MIN_SAMPLES}
+  jsonLd={jsonLd}
+>
+  <div class="mx-auto flex max-w-6xl flex-col gap-24 px-4 pt-16 sm:px-6">
+    <section class="flex flex-col gap-8">
+      <nav class="text-xs text-muted-foreground">
+        <a class="hover:underline" href={localePath(locale, "/")}>{t.domain.breadcrumbHome}</a>
+        <span class="mx-2">/</span>
+        <span>{domain}</span>
+      </nav>
+      <h1 class="text-4xl font-semibold tracking-tight break-words sm:text-5xl">
+        {fill(t.domain.title, { domain })}
+      </h1>
+      <p class="max-w-3xl text-lg leading-relaxed">
+        {known ? (
+          splitPlaceholders(fill(t.domain.leadKnown, { company, person: t.examplePerson.name })).map((part) =>
+            typeof part === "string" ? part
+            : part.key === "template" ? <AddressFormat template={topTemplate} domain={domain} labels={t.tokens} />
+            : <strong class="font-semibold text-primary">{example}</strong>,
+          )
+        ) : (
+          <span class="text-muted-foreground">{fill(t.domain.leadUnknown, { domain })}</span>
+        )}
+      </p>
+    </section>
+
+    <section class="flex flex-col gap-6">
+      <SectionHeading title={known ? fill(t.domain.distributionTitle, { domain }) : t.domain.defaultsTitle} />
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>{t.domain.colFormat}</TableHead>
+            <TableHead className="hidden sm:table-cell">{t.domain.colExample}</TableHead>
+            <TableHead className="text-right">{t.domain.colShare}</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {formats.map((f, i) => {
+            const template = patternById(f.patternId)!.template
+            return (
+              <TableRow>
+                <TableCell className="py-3">
+                  <a href={localePath(locale, `/patterns/${f.patternId}`)} class="text-sm hover:underline">
+                    <AddressFormat template={template} labels={t.tokens} />
+                  </a>
+                </TableCell>
+                <TableCell className="hidden sm:table-cell">{applyTemplate(template, person)}@{domain}</TableCell>
+                <TableCell className="flex justify-end">
+                  <LikelihoodBar share={f.confidence} label={formatPercent(locale, f.confidence)} strong={i === 0 && known} />
+                </TableCell>
+              </TableRow>
+            )
+          })}
+        </TableBody>
+      </Table>
+      {known && (
+        <p class="text-xs text-muted-foreground">
+          {fill(t.domain.basedOn, { count: formatNumber(locale, record!.sampleCount), domain })}
+        </p>
+      )}
+    </section>
+
+    <section class="flex flex-col gap-8">
+      <SectionHeading title={fill(t.domain.findTitle, { domain })} />
+      <Finder
+        client:visible
+        t={t.finder}
+        tokens={t.tokens}
+        lang={LOCALES[locale].htmlLang}
+        domainHref={localePath(locale, "/{domain}")}
+        defaultDomain={domain}
+      />
+    </section>
+
+    <section class="flex flex-col gap-6">
+      <dl class="grid gap-x-12 md:grid-cols-2">
+        {faq.map((item) => (
+          <div class="flex flex-col gap-2 border-t border-border py-6">
+            <dt class="text-base font-semibold">{item.q}</dt>
+            <dd class="text-sm leading-relaxed text-muted-foreground">{item.a}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+
+    {related.length > 0 && (
+      <section class="flex flex-col gap-6">
+        <SectionHeading title={fill(t.domain.relatedTitle, { template: renameTokens(topTemplate, t.tokens) })} />
+        <div class="flex flex-wrap gap-1">
+          {related.map((r) => (
+            <LinkButton variant="outline" size="sm" href={localePath(locale, `/${r.domain}`)}>{r.domain}</LinkButton>
+          ))}
+        </div>
+      </section>
+    )}
+  </div>
+</Base>

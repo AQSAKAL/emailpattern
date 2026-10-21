@@ -1,0 +1,39 @@
+# emailpattern.com
+
+A one-page site plus SEO pages for every company domain: type a name and a company website, get the
+company's email format and the likely address. Same answers over a REST API and an MCP endpoint.
+
+## Layout
+
+- `src/lib/email/` — pure calculations: name parsing, domain normalising, the pattern catalogue,
+  ranking (`candidates.ts`) and learning a domain's formats from known addresses (`infer.ts`). Tested in `tests/`.
+- `src/server/` — effects: SQLite store (`node:sqlite`), DNS MX lookups, the shared `findEmails` service,
+  MCP server, OpenAPI document. The page, `/api/v1/*` and `/mcp` all go through `findEmails`.
+- `src/i18n/` — locales and one typed dictionary per language. English at the root, others under `/{code}/`.
+  Adding a language: a dictionary in `dictionaries/` and an entry in `locales.ts`; `tests/i18n.test.ts`
+  fails if keys or placeholders differ from English.
+- `src/views/` — one Astro view per page type, taking a `locale`. `src/pages/` holds thin route files
+  that pick the locale and call a view; `[lang]/…` mirrors the root routes.
+- `src/components/ui/` — shadcn (radix, nova style). Build UI from these. `shadcn add`/`apply` has written
+  `import { cn } from "cn"` and installed an npm package `cn`; point it back at `@/lib/utils` and uninstall it.
+- `src/lib/showcase.ts` — the company logos under the hero, one set per language (from `simple-icons`).
+  They link to those companies' pages and are worded as examples to look up, never as customers.
+
+## Rules
+
+- Business-classic look: white/slate with a navy primary, Inter only (mono just for code), tinted
+  full-width bands and hairline rules; never boxed or shadowed cards.
+- Say that the site, API and MCP are free; the copy lives in the dictionaries.
+- Keep calculations pure and tested; effects (DB, DNS, fetch) stay in `src/server/`.
+- Store only each domain's pattern weights, never the sample addresses.
+- Domain pages with fewer than `INDEXABLE_MIN_SAMPLES` people are `noindex` and left out of sitemaps.
+- In `.astro` files, React components take `className`, plain HTML takes `class`.
+
+## Commands
+
+- `npm run dev` — dev server; an empty store fills itself from `seed/dev-samples.jsonl` (made-up `.example` companies)
+- `npm test` / `npm run check` / `npm run build`
+- `npm run import -- samples.jsonl` — learn formats from `{name, email, company?}` lines into `$DATA_DIR`
+
+When starting the dev server, use background mode: `astro dev --background`
+(`astro dev stop`, `astro dev status`, `astro dev logs`).
