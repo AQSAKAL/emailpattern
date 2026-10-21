@@ -1,19 +1,19 @@
-# emailpattern
+# @emailpattern/cli
 
 Find the email format any company uses, and the likely address for a person there, from your terminal.
 Free, no account, no key. It calls the public API at [emailpattern.com](https://emailpattern.com).
 
 ```sh
-npx emailpattern find "Jane Doe" acme.com
+npx @emailpattern/cli find "Jane Doe" acme.com
 ```
 
 ## Install
 
 ```sh
-npm install -g emailpattern     # Node 20 or newer
+npm install -g @emailpattern/cli     # Node 20 or newer; the command is `emailpattern`
 ```
 
-There is also a Python version with the same commands: `pipx install emailpattern`.
+There is also a Python version with the same commands, and a Python SDK: `pip install emailpattern`.
 
 ## Use
 
@@ -33,7 +33,7 @@ Set `EMAILPATTERN_API` or `--api` to use another server. `NO_COLOR` turns colour
 ## From code
 
 ```js
-import { Client } from "emailpattern"
+import { Client } from "@emailpattern/cli"
 
 const client = new Client()
 const result = await client.find("acme.com", "Jane Doe")

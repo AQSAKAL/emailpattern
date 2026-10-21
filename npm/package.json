@@ -1,5 +1,5 @@
 {
-  "name": "emailpattern",
+  "name": "@emailpattern/cli",
   "version": "0.2.0",
   "description": "Find the email format any company uses, and the likely address for a person there. Free, no account.",
   "keywords": [
@@ -42,5 +42,8 @@
     "commander": "^14.0.3",
     "csv-parse": "^7.0.3",
     "csv-stringify": "^6.9.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

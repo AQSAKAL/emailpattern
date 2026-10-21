@@ -63,7 +63,7 @@ pass `--name-column` / `--domain-column` when yours are called something else.
 
 Set `EMAILPATTERN_API` or `--api` (CLI) / `Client(base_url=...)` (SDK) to use another server.
 
-There is also an npm version of the command line: `npx emailpattern find "Jane Doe" acme.com`.
+There is also an npm version of the command line: `npx @emailpattern/cli find "Jane Doe" acme.com`.
 
 ## Develop
 

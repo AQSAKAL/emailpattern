@@ -17,7 +17,7 @@ company's email format and the likely address. Same answers over a REST API and 
 - `cli/` — the `emailpattern` PyPI package: a typed Python SDK (`emailpattern.find`, `Client`, `AsyncClient`,
   dataclass results in `models.py`, HTTP only in `client.py`) and the click + rich-click command line built on it
   (`cli.py`). `cd cli && uv run pytest`. Its colours mirror the site's forest/leaf palette in `_render.py`.
-- `npm/` — the same CLI for Node (`npx emailpattern`), commander + csv-parse, no colour library; `npm test`.
+- `npm/` — the same CLI for Node (`@emailpattern/cli` on npm, `npx @emailpattern/cli`; the bare name `emailpattern` was refused as too close to `email-pattern`), commander + csv-parse, no colour library; `npm test`.
   Keep its commands and output in step with `cli/`. Both publish from a `cli-v<version>` tag
   (`.github/workflows/release-cli.yml`); bump both versions together.
 - `src/components/ui/` — shadcn (radix, nova style). Build UI from these. `shadcn add`/`apply` has written

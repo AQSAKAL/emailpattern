@@ -1,5 +1,5 @@
 // HTTP calls to the public API. The only module that talks to the network.
-// Also the package's programmatic entry: import { Client } from "emailpattern".
+// Also the package's programmatic entry: import { Client } from "@emailpattern/cli".
 
 export const DEFAULT_API = "https://emailpattern.com"
 export const MAX_BATCH = 50
