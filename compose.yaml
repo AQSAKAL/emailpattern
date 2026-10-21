@@ -1,6 +1,6 @@
-# Runs on a shared server as a side project. The box's Caddy (part of the host
-# stack) owns ports 80 and 443 and routes emailpattern.com to emailpattern-web:4321 over
-# the stack's <proxy-network> overlay network, so nothing is published here.
+# Runs behind an existing reverse proxy that reaches emailpattern-web:4321 over a shared Docker
+# network, so no ports are published here. Set PROXY_NETWORK in a .env next to this file
+# (not committed) to that network's name.
 services:
   emailpattern-web:
     build: .
@@ -10,10 +10,11 @@ services:
     volumes:
       - data:/data
     networks:
-      - <proxy-network>
+      - proxy
 
 networks:
-  <proxy-network>:
+  proxy:
+    name: ${PROXY_NETWORK:?Set PROXY_NETWORK in .env to your reverse proxy's Docker network}
     external: true
 
 volumes:

@@ -40,12 +40,12 @@ Not stored: query strings, names, raw IPs.
 
 ## Open it
 
-Fetch the logs from the server (the data volume is `emailpattern_data`) and start DuckDB next to them:
+Copy the `usage/` folder out of the app's data volume (`emailpattern_data`) on your server and start
+DuckDB next to it:
 
 ```sh
 mkdir -p ~/emailpattern-usage && cd ~/emailpattern-usage
-rsync -az -e "ssh -i ~/.ssh/<ssh-key> -o IdentitiesOnly=yes" \
-  <user>@<server>:<data-volume>/usage/ ./usage/
+rsync -az <user>@<your-server>:<path of the emailpattern_data volume>/usage/ ./usage/
 duckdb -init ~/emailpattern/scripts/usage.sql
 ```
 

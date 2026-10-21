@@ -38,21 +38,18 @@ Only the per-domain pattern weights are kept.
 npm run import -- path/to/samples.jsonl
 ```
 
-## Deploy 
+## Deploy
 
-Runs on the host box as a side project, like the other sites there: a Compose project in
-`<app-dir>` attached to the host stack's `<proxy-network>` network. The host's Caddy
-(`deployment/Caddyfile` in the host repo) holds the `emailpattern.com` block, fetches the
-certificates and proxies to `emailpattern-web:4321`.
+`compose.yaml` runs the app behind a reverse proxy you already have (Caddy, Traefik, nginx…) that
+reaches it on port 4321 over a shared Docker network. Put that network's name in a `.env` file next
+to `compose.yaml` (it is not committed):
 
 ```sh
-# first time
-git clone https://github.com/AQSAKAL/emailpattern.git <app-dir>
-# every release
-cd <app-dir> && git pull && docker compose up -d --build
+echo "PROXY_NETWORK=<your proxy's docker network>" > .env
+docker compose up -d --build
 # load samples
 docker compose cp samples.jsonl emailpattern-web:/data/samples.jsonl
 docker compose exec emailpattern-web npm run import -- /data/samples.jsonl
 ```
 
-DNS (<dns-provider>): `A @ → <server-ip>`, `CNAME www → emailpattern.com.`
+Point your proxy for your domain at `emailpattern-web:4321` and set `TRUST_PROXY=1` (already set in the image).
