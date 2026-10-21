@@ -40,10 +40,19 @@ npm run import -- path/to/samples.jsonl
 
 ## Deploy 
 
+Runs on the host box as a side project, like the other sites there: a Compose project in
+`<app-dir>` attached to the host stack's `<proxy-network>` network. The host's Caddy
+(`deployment/Caddyfile` in the host repo) holds the `emailpattern.com` block, fetches the
+certificates and proxies to `emailpattern-web:4321`.
+
 ```sh
-docker compose up -d --build
-docker compose cp samples.jsonl app:/data/samples.jsonl
-docker compose exec app npm run import -- /data/samples.jsonl
+# first time
+git clone https://github.com/AQSAKAL/emailpattern.git <app-dir>
+# every release
+cd <app-dir> && git pull && docker compose up -d --build
+# load samples
+docker compose cp samples.jsonl emailpattern-web:/data/samples.jsonl
+docker compose exec emailpattern-web npm run import -- /data/samples.jsonl
 ```
 
-Point the `emailpattern.com` and `www` A/AAAA records at the box first; Caddy fetches the certificates.
+DNS (<dns-provider>): `A @ → <server-ip>`, `CNAME www → emailpattern.com.`

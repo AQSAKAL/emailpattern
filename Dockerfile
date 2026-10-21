@@ -11,7 +11,7 @@ ENV NODE_ENV=production HOST=0.0.0.0 PORT=4321 DATA_DIR=/data TRUST_PROXY=1
 COPY --from=build /app/package.json ./
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
-# The import script runs from source with tsx: docker compose exec app npm run import -- /data/samples.jsonl
+# The import script runs from source with tsx: docker compose exec emailpattern-web npm run import -- /data/samples.jsonl
 COPY --from=build /app/scripts ./scripts
 COPY --from=build /app/src ./src
 RUN mkdir -p /data && chown node:node /data
