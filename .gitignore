@@ -33,3 +33,7 @@ data/
 .venv/
 __pycache__/
 .pytest_cache/
+
+# package builds
+cli/dist/
+npm/*.tgz

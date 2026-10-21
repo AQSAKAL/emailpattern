@@ -1,0 +1,58 @@
+# Publishes the command line to PyPI and npm when a cli-v<version> tag is pushed.
+# Both registries use trusted publishing (OIDC), so no tokens are stored here.
+name: Release CLI
+
+on:
+  push:
+    tags: ["cli-v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Package versions match the tag
+        run: |
+          version="${GITHUB_REF_NAME#cli-v}"
+          grep -q "^version = \"$version\"$" cli/pyproject.toml || { echo "cli/pyproject.toml is not $version"; exit 1; }
+          test "$(node -p "require('./npm/package.json').version")" = "$version" || { echo "npm/package.json is not $version"; exit 1; }
+
+  pypi:
+    needs: check
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    defaults:
+      run:
+        working-directory: cli
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv run pytest -q
+      - run: uv build
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: cli/dist
+
+  npm:
+    needs: check
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      id-token: write
+    defaults:
+      run:
+        working-directory: npm
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      - run: npm ci
+      - run: npm test
+      - run: npm publish --provenance --access public

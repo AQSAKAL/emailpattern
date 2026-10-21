@@ -16,6 +16,9 @@ company's email format and the likely address. Same answers over a REST API and 
   that pick the locale and call a view; `[lang]/…` mirrors the root routes.
 - `cli/` — Python command line (`emailpattern find|domain|bulk`), click + rich-click + rich, calls the public
   API only. `cd cli && uv run pytest`. Its colours mirror the site's forest/leaf palette in `render.py`.
+- `npm/` — the same CLI for Node (`npx emailpattern`), commander + csv-parse, no colour library; `npm test`.
+  Keep its commands and output in step with `cli/`. Both publish from a `cli-v<version>` tag
+  (`.github/workflows/release-cli.yml`); bump both versions together.
 - `src/components/ui/` — shadcn (radix, nova style). Build UI from these. `shadcn add`/`apply` has written
   `import { cn } from "cn"` and installed an npm package `cn`; point it back at `@/lib/utils` and uninstall it.
 - `src/lib/showcase.ts` — the company logos under the hero, one set per language (from `simple-icons`).
@@ -45,3 +48,9 @@ or a raw IP in an event. Routes must be server-rendered (`prerender = false`) or
 
 When starting the dev server, use background mode: `astro dev --background`
 (`astro dev stop`, `astro dev status`, `astro dev logs`).
+
+## Never in this repo
+
+It is public. No server addresses, hostnames, DNS records, SSH keys or users, server paths, internal network
+names or which provider hosts it, in code, docs, comments or commit messages. Use placeholders such as
+`<your-server>`; deployment specifics live outside the repo.

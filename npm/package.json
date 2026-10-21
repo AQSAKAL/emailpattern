@@ -1,0 +1,46 @@
+{
+  "name": "emailpattern",
+  "version": "0.1.0",
+  "description": "Find the email format any company uses, and the likely address for a person there. Free, no account.",
+  "keywords": [
+    "email",
+    "email-finder",
+    "email-format",
+    "email-pattern",
+    "lead-generation",
+    "sales",
+    "cli"
+  ],
+  "homepage": "https://emailpattern.com",
+  "bugs": "https://github.com/AQSAKAL/emailpattern/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AQSAKAL/emailpattern.git",
+    "directory": "npm"
+  },
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "emailpattern": "bin/emailpattern.js"
+  },
+  "exports": {
+    ".": "./src/api.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "dependencies": {
+    "commander": "^14.0.3",
+    "csv-parse": "^7.0.3",
+    "csv-stringify": "^6.9.0"
+  }
+}

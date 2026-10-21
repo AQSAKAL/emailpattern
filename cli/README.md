@@ -6,9 +6,11 @@ Free, no account, no key. It calls the public API at [emailpattern.com](https://
 ## Install
 
 ```sh
-uv tool install "git+https://github.com/AQSAKAL/emailpattern#subdirectory=cli"
-# or: pipx install "git+https://github.com/AQSAKAL/emailpattern#subdirectory=cli"
+pipx install emailpattern        # or: uv tool install emailpattern
+uvx emailpattern find "Jane Doe" acme.com   # run once without installing
 ```
+
+There is also an npm version with the same commands: `npx emailpattern find "Jane Doe" acme.com`.
 
 ## Use
 
@@ -32,3 +34,8 @@ uv sync
 uv run pytest
 uv run emailpattern --help
 ```
+
+## Release
+
+Bump `version` here and in `../npm/package.json`, then push a `cli-v<version>` tag; the
+`release-cli` workflow builds and publishes both packages.
