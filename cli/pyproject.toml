@@ -1,13 +1,13 @@
 [project]
 name = "emailpattern"
-version = "0.1.0"
-description = "Find the email format any company uses, and the likely address for a person there. Free, no account."
+version = "0.2.0"
+description = "Find the email format any company uses, and the likely address for a person there. Python SDK and command line; free, no account."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "EmailPattern" }]
-keywords = ["email", "email-finder", "email-format", "email-pattern", "lead-generation", "sales", "cli"]
+keywords = ["email", "email-finder", "sdk", "api-client", "email-format", "email-pattern", "lead-generation", "sales", "cli"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Environment :: Console",
@@ -22,6 +22,8 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Topic :: Communications :: Email",
     "Topic :: Utilities",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
 ]
 dependencies = [
     "click>=8.1",
@@ -37,7 +39,7 @@ Source = "https://github.com/AQSAKAL/emailpattern"
 Issues = "https://github.com/AQSAKAL/emailpattern/issues"
 
 [project.scripts]
-emailpattern = "emailpattern_cli.main:cli"
+emailpattern = "emailpattern.cli:cli"
 
 [dependency-groups]
 dev = ["pytest>=8"]
@@ -47,7 +49,7 @@ requires = ["hatchling>=1.27"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/emailpattern_cli"]
+packages = ["src/emailpattern"]
 
 [tool.hatch.build.targets.sdist]
 include = ["src", "tests", "README.md", "LICENSE"]

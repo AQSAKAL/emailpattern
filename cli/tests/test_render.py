@@ -1,6 +1,6 @@
 from rich.console import Console
 
-from emailpattern_cli import render
+from emailpattern import _render as render
 
 RESULT = {
     "query": {"domain": "acme.com", "name": "Jane Doe"},

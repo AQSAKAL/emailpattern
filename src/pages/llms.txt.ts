@@ -26,7 +26,7 @@ Answers are inferred from each company's format, with a confidence between 0 and
 
 ## CLI
 
-- uv tool install "git+https://github.com/AQSAKAL/emailpattern#subdirectory=cli"
+- pip install emailpattern (Python SDK: emailpattern.find(name, domain), Client, AsyncClient; and the CLI)
 - emailpattern find "Jane Doe" acme.com · emailpattern domain acme.com · emailpattern bulk leads.csv
 
 ## Pages

@@ -3,8 +3,8 @@ import json
 import httpx
 from click.testing import CliRunner
 
-from emailpattern_cli.api import Client
-from emailpattern_cli.main import cli
+from emailpattern.client import Client
+from emailpattern.cli import cli
 
 
 def result(domain: str, name: str | None = None, error: str | None = None) -> dict:

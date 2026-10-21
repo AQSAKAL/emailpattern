@@ -1,6 +1,6 @@
 import io
 
-from emailpattern_cli.csvio import DOMAIN_COLUMNS, NAME_COLUMNS, batches, pick_column, result_fields, write_rows
+from emailpattern._csv import DOMAIN_COLUMNS, NAME_COLUMNS, batches, pick_column, result_fields, write_rows
 
 
 def test_pick_column_matches_common_headers_case_insensitively():

@@ -1,4 +1,4 @@
-"""The `emailpattern` command."""
+"""The `emailpattern` command, built on the SDK in emailpattern.client."""
 
 from __future__ import annotations
 
@@ -12,9 +12,10 @@ import rich_click as click
 from rich.console import Console
 from rich.progress import BarColumn, MofNCompleteColumn, Progress, TextColumn
 
-from emailpattern_cli import __version__, render
-from emailpattern_cli.api import DEFAULT_API, MAX_BATCH, ApiError, Client
-from emailpattern_cli.csvio import DOMAIN_COLUMNS, NAME_COLUMNS, batches, pick_column, result_fields, write_rows
+from emailpattern import __version__
+from emailpattern import _render as render
+from emailpattern.client import DEFAULT_API, MAX_BATCH, ApiError, Client
+from emailpattern._csv import DOMAIN_COLUMNS, NAME_COLUMNS, batches, pick_column, result_fields, write_rows
 
 # Help pages in the site's palette.
 click.rich_click.STYLE_OPTION = "bold #5fd47e"
@@ -55,7 +56,7 @@ def cli(ctx: click.Context, api: str) -> None:
     Free, no account, no key.
     """
     ctx.ensure_object(dict)
-    ctx.obj.setdefault("client", Client(api))
+    ctx.obj.setdefault("client", Client(api, user_agent=f"emailpattern-cli/{__version__}"))
 
 
 @cli.command()
@@ -69,7 +70,7 @@ def find(ctx: click.Context, name: str, domain: str, as_json: bool) -> None:
     `emailpattern find "Jane Doe" acme.com`
     """
     try:
-        result = _client(ctx).find(domain, name)
+        result = _client(ctx).find_raw(domain, name)
     except (ApiError, OSError) as error:
         _fail(str(error))
         return
@@ -91,7 +92,7 @@ def domain(ctx: click.Context, domain: str, as_json: bool) -> None:
     `emailpattern domain acme.com`
     """
     try:
-        result = _client(ctx).domain(domain)
+        result = _client(ctx).domain(domain).raw
     except (ApiError, OSError) as error:
         _fail(str(error))
         return
@@ -142,7 +143,7 @@ def bulk(ctx: click.Context, source: Path, output: Path | None, name_column: str
         for chunk in batches(rows, MAX_BATCH):
             queries = [{"domain": r.get(domain_key) or "", "name": r.get(name_key) or ""} for r in chunk]
             try:
-                results = client.find_many(queries)
+                results = client.find_many_raw(queries)
             except (ApiError, OSError) as error:
                 _fail(str(error))
                 return

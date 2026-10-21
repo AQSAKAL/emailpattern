@@ -26,12 +26,11 @@ console.log(results[0].candidates[0].email)`,
     {
       id: "python",
       label: "Python",
-      code: `import httpx
+      code: `# pip install emailpattern
+import emailpattern
 
-r = httpx.get("${origin}/api/v1/find",
-              params={"domain": "acme.com", "name": "${name}"})
-best = r.json()["candidates"][0]
-print(best["email"], best["confidence"])`,
+found = emailpattern.find("${name}", "acme.com")
+print(found.email, found.best.confidence)`,
     },
     {
       id: "response",
@@ -90,8 +89,8 @@ export function cliSamples(name: string): CodeSample[] {
     {
       id: "install",
       label: "Install",
-      code: `uv tool install "git+https://github.com/AQSAKAL/emailpattern#subdirectory=cli"
-# or: pipx install "git+https://github.com/AQSAKAL/emailpattern#subdirectory=cli"`,
+      code: `pipx install emailpattern     # or: uv tool install emailpattern
+uvx emailpattern find "${name}" acme.com   # without installing`,
     },
     {
       id: "find",

@@ -60,8 +60,11 @@ export function classifyPath(pathname: string): PathInfo {
 
 export type AgentKind = "browser" | "crawler" | "ai_crawler" | "ai_agent" | "library" | "unknown"
 
-// Order matters: bots first, they all claim to be Mozilla/5.0.
+// Order matters: our own clients first, then bots (they all claim to be Mozilla/5.0).
 const AGENTS: [RegExp, string, AgentKind][] = [
+  [/^emailpattern-cli\//i, "emailpattern-cli", "library"],
+  [/^emailpattern-python\//i, "emailpattern-python", "library"],
+  [/^emailpattern-npm\//i, "emailpattern-npm", "library"],
   [/Claude-User/i, "Claude-User", "ai_agent"],
   [/ClaudeBot|Claude-SearchBot|anthropic-ai/i, "ClaudeBot", "ai_crawler"],
   [/ChatGPT-User/i, "ChatGPT-User", "ai_agent"],

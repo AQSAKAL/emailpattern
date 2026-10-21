@@ -1,6 +1,6 @@
 {
   "name": "emailpattern",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Find the email format any company uses, and the likely address for a person there. Free, no account.",
   "keywords": [
     "email",
