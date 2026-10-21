@@ -9,7 +9,7 @@ For many lookups, or to reuse a connection, use Client / AsyncClient. The same p
 installs the `emailpattern` command line.
 """
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 from emailpattern.client import DEFAULT_API, MAX_BATCH, ApiError, AsyncClient, Client, Person, RateLimited  # noqa: E402
 from emailpattern.models import Candidate, FindResult, Mail  # noqa: E402

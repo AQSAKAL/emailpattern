@@ -3,7 +3,7 @@
 
 export const DEFAULT_API = "https://emailpattern.com"
 export const MAX_BATCH = 50
-const VERSION = "0.2.0"
+const VERSION = "0.2.1"
 
 export class ApiError extends Error {}
 

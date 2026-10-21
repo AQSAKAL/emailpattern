@@ -119,4 +119,4 @@ def test_async_client_matches_the_sync_one():
 
 def test_module_level_helpers_exist():
     assert callable(emailpattern.find) and callable(emailpattern.domain)
-    assert emailpattern.__version__ == "0.2.0"
+    assert emailpattern.__version__ == "0.2.1"

@@ -9,7 +9,7 @@ import { colorEnabled, palette } from "./colors.js"
 import { DOMAIN_COLUMNS, NAME_COLUMNS, batches, pickColumn, readCsv, resultFields, writeCsv } from "./csv.js"
 import { bulkSummary, domainResult, findResult, progressLine } from "./render.js"
 
-const VERSION = "0.2.0"
+const VERSION = "0.2.1"
 
 export function defaultOutput(source) {
   return join(dirname(source), `${basename(source, extname(source))}.emails.csv`)

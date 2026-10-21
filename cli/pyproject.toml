@@ -1,6 +1,6 @@
 [project]
 name = "emailpattern"
-version = "0.2.0"
+version = "0.2.1"
 description = "Find the email format any company uses, and the likely address for a person there. Python SDK and command line; free, no account."
 readme = "README.md"
 requires-python = ">=3.10"
