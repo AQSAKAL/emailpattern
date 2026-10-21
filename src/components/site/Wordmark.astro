@@ -1,10 +1,19 @@
 ---
-import { AtSign } from "lucide-react"
+import LogoMark from "@/components/site/LogoMark.astro"
+import { cn } from "@/lib/utils"
+
+interface Props {
+  /** "dark" on the forest frame, "light" on white panels. */
+  on?: "dark" | "light"
+}
+
+const { on = "dark" } = Astro.props
+const brace = on === "dark" ? "text-leaf" : "text-sage"
 ---
 
 <span class="flex items-center gap-2.5">
-  <span class="flex size-8 items-center justify-center rounded-lg border-2 border-leaf text-leaf">
-    <AtSign className="size-4.5" strokeWidth={2.5} />
+  <LogoMark class="size-9 shrink-0 -rotate-6 transition-transform group-hover:rotate-0" />
+  <span class="text-xl font-semibold tracking-tight">
+    email<span class={cn("font-normal", brace)}>{"{"}</span>pattern<span class={cn("font-normal", brace)}>{"}"}</span>
   </span>
-  <span class="text-lg font-semibold tracking-tight">EmailPattern</span>
 </span>

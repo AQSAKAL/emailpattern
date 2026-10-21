@@ -11,6 +11,9 @@ if (!file) {
 }
 
 const store = openStore(resolve(process.env.DATA_DIR ?? "data", "emailpattern.sqlite"))
-const { domains, samples } = await importSamples(store, resolve(file))
+const counts = await importSamples(store, resolve(file))
 store.close()
-console.log(`${samples} samples → ${domains} domains`)
+console.log(
+  `${counts.lines} lines: ${counts.samples} addresses and ${counts.statements} stated formats ` +
+    `(${counts.skippedFreeMail} free-mail skipped) → ${counts.domains} domains`,
+)

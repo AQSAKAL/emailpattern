@@ -1,0 +1,21 @@
+---
+// The mark: an @ between pattern braces, {@}, on a leaf-green tag with the ink outline
+// the tag piles use. Paths only, so it renders the same without any font.
+interface Props {
+  class?: string
+}
+
+const { class: className } = Astro.props
+---
+
+<svg viewBox="0 0 32 32" class={className} role="img" aria-label="EmailPattern">
+  <rect x="1.25" y="1.25" width="29.5" height="29.5" rx="8" fill="var(--leaf)" stroke="var(--ink)" stroke-width="2.5"></rect>
+  <g fill="none" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9.6 8.6c-1.7 0-2.2.9-2.2 2.4v2.6c0 1.2-.6 2-1.7 2.4 1.1.4 1.7 1.2 1.7 2.4V21c0 1.5.5 2.4 2.2 2.4"></path>
+    <path d="M22.4 8.6c1.7 0 2.2.9 2.2 2.4v2.6c0 1.2.6 2 1.7 2.4-1.1.4-1.7 1.2-1.7 2.4V21c0 1.5-.5 2.4-2.2 2.4"></path>
+  </g>
+  <g transform="translate(9.4 9.4) scale(0.55)" fill="none" stroke="var(--ink)" stroke-width="4.3" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="4"></circle>
+    <path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8"></path>
+  </g>
+</svg>
