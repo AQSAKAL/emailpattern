@@ -7,6 +7,9 @@ export const en = {
   },
   nav: { find: "Find", patterns: "Formats", api: "API", mcp: "MCP", language: "Language", cta: "Free API" },
   footer: {
+    general: "General",
+    developers: "Developers",
+    languages: "Languages",
     tagline: "Free email format lookup for every company.",
     browse: "Browse companies",
     formats: "All formats",
@@ -47,6 +50,11 @@ export const en = {
   },
 
   home: {
+    tags: ["first.last", "Free forever", "No sign-up", "Mail server check", "Bulk lookups", "REST API", "MCP server", "15 formats"],
+    ctaBadge: "Free for everyone",
+    ctaTitle: "Ready to find the right address?",
+    ctaLead: "Type a name and a company website. You get the format, the address and the odds, free and without an account.",
+    ctaButton: "Find an email address",
     metaTitle: "Free email format finder: find anyone's business email address",
     badge: "Free · No sign-up · No credit card",
     title: "Find anyone's business email address.",
@@ -71,6 +79,9 @@ export const en = {
     mcpTitle: "MCP server",
     mcpLead: "Give Claude, Cursor or any MCP client the find_email tool. It looks up formats and addresses for whole lists of people at once.",
     mcpSteps: ["Add the server to your client", "Ask for addresses in plain language", "Your agent gets every address with its odds"],
+    cliEyebrow: "For the terminal",
+    cliTitle: "Command line",
+    cliLead: "Look people up from your terminal, or fill a whole CSV with addresses in one command. Free, no key.",
     freeEyebrow: "Pricing",
     freeTitle: "Free. No catch.",
     freeLead: "The website, the API and the MCP server are free to use. There is no account to create and nothing to pay.",

@@ -14,6 +14,8 @@ company's email format and the likely address. Same answers over a REST API and 
   fails if keys or placeholders differ from English.
 - `src/views/` — one Astro view per page type, taking a `locale`. `src/pages/` holds thin route files
   that pick the locale and call a view; `[lang]/…` mirrors the root routes.
+- `cli/` — Python command line (`emailpattern find|domain|bulk`), click + rich-click + rich, calls the public
+  API only. `cd cli && uv run pytest`. Its colours mirror the site's forest/leaf palette in `render.py`.
 - `src/components/ui/` — shadcn (radix, nova style). Build UI from these. `shadcn add`/`apply` has written
   `import { cn } from "cn"` and installed an npm package `cn`; point it back at `@/lib/utils` and uninstall it.
 - `src/lib/showcase.ts` — the company logos under the hero, one set per language (from `simple-icons`).
@@ -21,8 +23,8 @@ company's email format and the likely address. Same answers over a REST API and 
 
 ## Rules
 
-- Business-classic look: white/slate with a navy primary, Inter only (mono just for code), tinted
-  full-width bands and hairline rules; never boxed or shadowed cards.
+- Look: forest-green frame on a pale lime page, content on big rounded white/mint/lime panels, Figtree,
+  black uppercase pill buttons, piles of tilted outlined tags (`TagPile.astro`) as decoration.
 - Say that the site, API and MCP are free; the copy lives in the dictionaries.
 - Keep calculations pure and tested; effects (DB, DNS, fetch) stay in `src/server/`.
 - Store only each domain's pattern weights, never the sample addresses.

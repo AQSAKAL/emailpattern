@@ -84,3 +84,26 @@ export function mcpSamples(origin: string): CodeSample[] {
     },
   ]
 }
+
+export function cliSamples(name: string): CodeSample[] {
+  return [
+    {
+      id: "install",
+      label: "Install",
+      code: `uv tool install "git+https://github.com/AQSAKAL/emailpattern#subdirectory=cli"
+# or: pipx install "git+https://github.com/AQSAKAL/emailpattern#subdirectory=cli"`,
+    },
+    {
+      id: "find",
+      label: "find",
+      code: `emailpattern find "${name}" acme.com
+emailpattern domain acme.com`,
+    },
+    {
+      id: "bulk",
+      label: "bulk",
+      code: `# a CSV with name and website columns
+emailpattern bulk leads.csv -o leads-with-emails.csv`,
+    },
+  ]
+}

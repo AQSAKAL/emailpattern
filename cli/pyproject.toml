@@ -1,0 +1,30 @@
+[project]
+name = "emailpattern"
+version = "0.1.0"
+description = "Find the email format any company uses, and the likely address for a person there. Free, no account."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+dependencies = [
+    "click>=8.1",
+    "rich-click>=1.8",
+    "rich>=13.7",
+    "httpx>=0.27",
+]
+
+[project.urls]
+Homepage = "https://emailpattern.com"
+Source = "https://github.com/AQSAKAL/emailpattern"
+
+[project.scripts]
+emailpattern = "emailpattern_cli.main:cli"
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/emailpattern_cli"]

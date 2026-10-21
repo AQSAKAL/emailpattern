@@ -1,4 +1,5 @@
 ---
+import Panel from "@/components/site/Panel.astro"
 import { AddressFormat } from "@/components/AddressFormat"
 import { Finder } from "@/components/Finder"
 import { LikelihoodBar } from "@/components/LikelihoodBar"
@@ -80,7 +81,9 @@ const jsonLd = [
   noindex={!record || record.sampleCount < INDEXABLE_MIN_SAMPLES}
   jsonLd={jsonLd}
 >
-  <div class="mx-auto flex max-w-6xl flex-col gap-24 px-4 pt-16 sm:px-6">
+  <div class="px-2 sm:px-4">
+  <Panel class="px-6 py-12 sm:px-12 sm:py-16">
+  <div class="mx-auto flex max-w-6xl flex-col gap-24">
     <section class="flex flex-col gap-8">
       <nav class="text-xs text-muted-foreground">
         <a class="hover:underline" href={localePath(locale, "/")}>{t.domain.breadcrumbHome}</a>
@@ -95,7 +98,7 @@ const jsonLd = [
           splitPlaceholders(fill(t.domain.leadKnown, { company, person: t.examplePerson.name })).map((part) =>
             typeof part === "string" ? part
             : part.key === "template" ? <AddressFormat template={topTemplate} domain={domain} labels={t.tokens} />
-            : <strong class="font-semibold text-primary">{example}</strong>,
+            : <strong class="font-semibold text-token-first">{example}</strong>,
           )
         ) : (
           <span class="text-muted-foreground">{fill(t.domain.leadUnknown, { domain })}</span>
@@ -172,5 +175,7 @@ const jsonLd = [
         </div>
       </section>
     )}
+  </div>
+  </Panel>
   </div>
 </Base>

@@ -6,6 +6,9 @@ export const de: Dictionary = {
   },
   nav: { find: "Suchen", patterns: "Formate", api: "API", mcp: "MCP", language: "Sprache", cta: "Kostenlose API" },
   footer: {
+    general: "Allgemein",
+    developers: "Entwickler",
+    languages: "Sprachen",
     tagline: "Kostenlose E-Mail-Formate für jede Firma.",
     browse: "Firmen durchsuchen",
     formats: "Alle Formate",
@@ -46,6 +49,11 @@ export const de: Dictionary = {
   },
 
   home: {
+    tags: ["vorname.nachname", "Für immer kostenlos", "Ohne Anmeldung", "Mailserver-Check", "Massensuche", "REST-API", "MCP-Server", "15 Formate"],
+    ctaBadge: "Kostenlos für alle",
+    ctaTitle: "Bereit, die richtige Adresse zu finden?",
+    ctaLead: "Geben Sie einen Namen und die Website einer Firma ein. Sie erhalten Format, Adresse und Wahrscheinlichkeit, kostenlos und ohne Konto.",
+    ctaButton: "E-Mail-Adresse finden",
     metaTitle: "Kostenloser E-Mail-Format-Finder: geschäftliche E-Mail-Adressen finden",
     badge: "Kostenlos · Ohne Anmeldung · Ohne Kreditkarte",
     title: "Finden Sie die geschäftliche E-Mail-Adresse jeder Person.",
@@ -70,6 +78,9 @@ export const de: Dictionary = {
     mcpTitle: "MCP-Server",
     mcpLead: "Geben Sie Claude, Cursor oder jedem MCP-Client das Werkzeug find_email. Es findet Formate und Adressen für ganze Listen von Personen auf einmal.",
     mcpSteps: ["Server im Client eintragen", "In normaler Sprache nach Adressen fragen", "Ihr Agent erhält jede Adresse mit ihrer Wahrscheinlichkeit"],
+    cliEyebrow: "Für das Terminal",
+    cliTitle: "Kommandozeile",
+    cliLead: "Suchen Sie Personen im Terminal, oder füllen Sie eine ganze CSV-Datei mit einem Befehl mit Adressen. Kostenlos, ohne Schlüssel.",
     freeEyebrow: "Preise",
     freeTitle: "Kostenlos. Ohne Haken.",
     freeLead: "Website, API und MCP-Server sind kostenlos. Sie legen kein Konto an und zahlen nichts.",

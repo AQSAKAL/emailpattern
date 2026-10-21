@@ -1,0 +1,20 @@
+---
+// The reference's buttons: uppercase pills, solid black, white, or outlined on the dark frame.
+import type { HTMLAttributes } from "astro/types"
+import { cn } from "@/lib/utils"
+
+type Props = HTMLAttributes<"a"> & { tone?: "ink" | "white" | "outline" | "outline-ink" }
+
+const { tone = "ink", class: className, ...rest } = Astro.props
+const tones = {
+  ink: "bg-ink text-white hover:bg-ink/85",
+  white: "bg-white text-ink hover:bg-mint",
+  outline: "border border-white/60 text-white hover:bg-white/10",
+  "outline-ink": "border border-ink text-ink hover:bg-ink/5",
+}
+---
+
+<a
+  class={cn("eyebrow inline-flex h-11 items-center justify-center gap-2 rounded-full px-6 transition-colors", tones[tone], className)}
+  {...rest}
+><slot /></a>

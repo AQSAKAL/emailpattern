@@ -1,4 +1,5 @@
 ---
+import Panel from "@/components/site/Panel.astro"
 import { AddressFormat } from "@/components/AddressFormat"
 import SectionHeading from "@/components/site/SectionHeading.astro"
 import LinkButton from "@/components/site/LinkButton.astro"
@@ -33,9 +34,11 @@ const examples = t.samplePeople
   description={fill(t.pattern.metaDescription, { template: localTemplate, label })}
   path={`/patterns/${pattern.id}`}
 >
-  <div class="mx-auto flex max-w-6xl flex-col gap-20 px-4 pt-16 sm:px-6">
+  <div class="px-2 sm:px-4">
+  <Panel class="px-6 py-12 sm:px-12 sm:py-16">
+  <div class="mx-auto flex max-w-6xl flex-col gap-20">
     <section class="flex flex-col gap-6">
-      <p class="text-sm font-semibold text-primary">{t.nav.patterns}</p>
+      <p class="eyebrow text-sage">{t.nav.patterns}</p>
       <h1 class="text-3xl font-semibold tracking-tight sm:text-5xl">
         <AddressFormat template={template} domain="acme.com" labels={t.tokens} className="break-all whitespace-normal" />
       </h1>
@@ -59,7 +62,7 @@ const examples = t.samplePeople
     <section class="flex flex-col gap-6">
       <SectionHeading title={t.pattern.formulaTitle} />
       <p class="text-sm text-muted-foreground">{t.pattern.formulaLead}</p>
-      <pre class="overflow-x-auto rounded-lg bg-[oklch(0.21_0.03_264)] p-5 font-mono text-sm text-[oklch(0.93_0.01_255)]"><code>{spreadsheetFormula(template)}</code></pre>
+      <pre class="overflow-x-auto rounded-lg bg-forest-deep p-5 font-mono text-sm text-mint"><code>{spreadsheetFormula(template)}</code></pre>
     </section>
 
     {companies.length > 0 && (
@@ -84,5 +87,7 @@ const examples = t.samplePeople
         ))}
       </div>
     </section>
+  </div>
+  </Panel>
   </div>
 </Base>

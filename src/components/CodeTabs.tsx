@@ -23,19 +23,19 @@ export function CodeTabs({ samples, copyLabel, copiedLabel }: { samples: CodeSam
   return (
     <Tabs value={active} onValueChange={setActive} className="min-w-0">
       <div className="flex items-center justify-between gap-2">
-        <TabsList>
+        <TabsList className="bg-white/10">
           {samples.map((s) => (
-            <TabsTrigger key={s.id} value={s.id}>{s.label}</TabsTrigger>
+            <TabsTrigger key={s.id} value={s.id} className="text-white/70 hover:text-white data-active:bg-white data-active:text-ink">{s.label}</TabsTrigger>
           ))}
         </TabsList>
-        <Button variant="ghost" size="sm" onClick={copy}>
+        <Button variant="ghost" size="sm" onClick={copy} className="text-white/75 hover:bg-white/10 hover:text-white">
           {copied ? <Check data-icon="inline-start" /> : <Copy data-icon="inline-start" />}
           {copied ? copiedLabel : copyLabel}
         </Button>
       </div>
       {samples.map((s) => (
         <TabsContent key={s.id} value={s.id}>
-          <pre className="overflow-x-auto rounded-lg bg-[oklch(0.21_0.03_264)] p-5 font-mono text-[13px] leading-relaxed text-[oklch(0.93_0.01_255)] dark:border dark:border-border">
+          <pre className="overflow-x-auto rounded-2xl border border-white/10 bg-forest-deep p-5 font-mono text-[13px] leading-relaxed text-mint">
             <code>{s.code}</code>
           </pre>
         </TabsContent>

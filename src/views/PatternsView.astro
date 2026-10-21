@@ -1,4 +1,5 @@
 ---
+import Panel from "@/components/site/Panel.astro"
 import { AddressFormat } from "@/components/AddressFormat"
 import SectionHeading from "@/components/site/SectionHeading.astro"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -19,7 +20,9 @@ const person = parseName(t.examplePerson.name)!
 ---
 
 <Base locale={locale} title={t.patterns.metaTitle} description={t.patterns.metaDescription} path="/patterns">
-  <div class="mx-auto flex max-w-6xl flex-col gap-10 px-4 pt-16 sm:px-6">
+  <div class="px-2 sm:px-4">
+  <Panel class="px-6 py-12 sm:px-12 sm:py-16">
+  <div class="mx-auto flex max-w-6xl flex-col gap-10">
     <SectionHeading as="h1" title={t.patterns.title} />
     <p class="max-w-2xl text-sm text-muted-foreground">{t.patterns.lead}</p>
     <Table>
@@ -46,5 +49,7 @@ const person = parseName(t.examplePerson.name)!
         ))}
       </TableBody>
     </Table>
+  </div>
+  </Panel>
   </div>
 </Base>

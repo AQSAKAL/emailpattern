@@ -1,4 +1,5 @@
 ---
+import Panel from "@/components/site/Panel.astro"
 import { AddressFormat } from "@/components/AddressFormat"
 import SectionHeading from "@/components/site/SectionHeading.astro"
 import LinkButton from "@/components/site/LinkButton.astro"
@@ -29,7 +30,9 @@ const label = letter.toUpperCase()
   path={`/browse/${letter}`}
   noindex={Boolean(after)}
 >
-  <div class="mx-auto flex max-w-6xl flex-col gap-8 px-4 pt-16 sm:px-6">
+  <div class="px-2 sm:px-4">
+  <Panel class="px-6 py-12 sm:px-12 sm:py-16">
+  <div class="mx-auto flex max-w-6xl flex-col gap-8">
     <SectionHeading as="h1" title={fill(t.browse.title, { letter: label })} />
     {rows.length === 0 ? (
       <p class="text-sm text-muted-foreground">{t.browse.empty}</p>
@@ -53,5 +56,7 @@ const label = letter.toUpperCase()
     {next && (
       <LinkButton variant="outline" class="self-start" href={`${localePath(locale, `/browse/${letter}`)}?after=${encodeURIComponent(next)}`}>{t.browse.next} →</LinkButton>
     )}
+  </div>
+  </Panel>
   </div>
 </Base>

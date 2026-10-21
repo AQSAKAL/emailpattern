@@ -40,21 +40,16 @@ const alternates = LOCALE_CODES.map((code) => ({ code, href: new URL(localePath(
     <meta property="og:locale" content={LOCALES[locale].ogLocale} />
     <meta name="twitter:card" content="summary" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#11151f" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#173a31" />
     {jsonLd.map((data) => <script type="application/ld+json" set:html={JSON.stringify(data)} />)}
-    <script is:inline>
-      const dark = window.matchMedia("(prefers-color-scheme: dark)")
-      const apply = () => document.documentElement.classList.toggle("dark", dark.matches)
-      apply()
-      dark.addEventListener("change", apply)
-    </script>
   </head>
-  <body class="min-h-dvh">
-    <Header locale={locale} path={path} />
-    <main>
-      <slot />
-    </main>
-    <Footer locale={locale} />
+  <body class="min-h-dvh p-2 sm:p-4">
+    <div class="overflow-hidden rounded-[1.75rem] border-[3px] border-ink bg-forest text-white sm:rounded-[2.5rem]">
+      <Header locale={locale} path={path} />
+      <main>
+        <slot />
+      </main>
+      <Footer locale={locale} />
+    </div>
   </body>
 </html>

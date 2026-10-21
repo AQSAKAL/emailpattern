@@ -1,4 +1,5 @@
 ---
+import Panel from "@/components/site/Panel.astro"
 import SectionHeading from "@/components/site/SectionHeading.astro"
 import LinkButton from "@/components/site/LinkButton.astro"
 import Base from "@/layouts/Base.astro"
@@ -8,8 +9,12 @@ export const prerender = false
 ---
 
 <Base locale="en" title="Not found · EmailPattern" description="This page does not exist." path="/404" noindex>
-  <div class="mx-auto flex max-w-6xl flex-col gap-8 px-4 pt-24 sm:px-6">
+  <div class="px-2 sm:px-4">
+  <Panel class="px-6 py-12 sm:px-12 sm:py-16">
+  <div class="mx-auto flex max-w-6xl flex-col gap-8">
     <SectionHeading as="h1" eyebrow="404" title="Nothing at this address." />
     <LinkButton variant="outline" class="self-start" href="/">Find an email format →</LinkButton>
+  </div>
+  </Panel>
   </div>
 </Base>

@@ -8,13 +8,15 @@ interface Props {
   /** h2 inside a page; h1 when the heading opens one. */
   as?: "h1" | "h2"
   center?: boolean
+  /** "dark" for headings sitting on the forest frame. */
+  on?: "panel" | "dark"
 }
 
-const { eyebrow, title, lead, as: Tag = "h2", center = false } = Astro.props
+const { eyebrow, title, lead, as: Tag = "h2", center = false, on = "panel" } = Astro.props
 ---
 
 <div class={cn("flex max-w-3xl flex-col gap-3", center && "mx-auto items-center text-center")}>
-  {eyebrow && <p class="text-sm font-semibold text-primary">{eyebrow}</p>}
-  <Tag class={cn("font-semibold tracking-tight text-balance", Tag === "h1" ? "text-4xl sm:text-5xl" : "text-3xl sm:text-4xl")}>{title}</Tag>
-  {lead && <p class="text-base leading-relaxed text-muted-foreground">{lead}</p>}
+  {eyebrow && <p class={cn("eyebrow", on === "dark" ? "text-leaf" : "text-sage")}>{eyebrow}</p>}
+  <Tag class={cn("font-medium tracking-tight text-balance", Tag === "h1" ? "text-4xl sm:text-5xl" : "text-3xl sm:text-[2.6rem] sm:leading-[1.1]")}>{title}</Tag>
+  {lead && <p class={cn("text-lg leading-relaxed", on === "dark" ? "text-white/70" : "text-muted-foreground")}>{lead}</p>}
 </div>

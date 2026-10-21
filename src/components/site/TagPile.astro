@@ -1,0 +1,87 @@
+---
+// A pile of tilted, outlined tags with toggle capsules and triangles, as in the
+// reference. Positions are hand-placed per layout; labels come from the dictionary.
+import { cn } from "@/lib/utils"
+
+type Tone = "leaf" | "lime" | "mint" | "sage"
+type Item =
+  | { kind: "tag"; label: number; x: number; y: number; r: number; tone: Tone }
+  | { kind: "toggle"; x: number; y: number; r: number; on: boolean }
+  | { kind: "triangle"; x: number; y: number; r: number; size: number }
+
+interface Props {
+  labels: readonly string[]
+  layout: "hero" | "cta"
+  class?: string
+}
+
+const LAYOUTS: Record<Props["layout"], Item[]> = {
+  hero: [
+    { kind: "triangle", x: 0, y: 40, r: -12, size: 64 },
+    { kind: "tag", label: 0, x: 34, y: 6, r: 9, tone: "leaf" },
+    { kind: "toggle", x: 8, y: 30, r: 0, on: false },
+    { kind: "tag", label: 1, x: 4, y: 44, r: -4, tone: "lime" },
+    { kind: "toggle", x: 52, y: 32, r: 8, on: true },
+    { kind: "tag", label: 2, x: 64, y: 48, r: 4, tone: "mint" },
+    { kind: "triangle", x: 40, y: 50, r: 18, size: 56 },
+    { kind: "toggle", x: 6, y: 58, r: 10, on: true },
+    { kind: "tag", label: 3, x: 22, y: 60, r: 12, tone: "sage" },
+    { kind: "tag", label: 4, x: 10, y: 76, r: 8, tone: "mint" },
+    { kind: "triangle", x: 84, y: 78, r: -20, size: 60 },
+  ],
+  cta: [
+    { kind: "toggle", x: 1, y: 52, r: -30, on: true },
+    { kind: "tag", label: 5, x: 6, y: 18, r: -18, tone: "sage" },
+    { kind: "tag", label: 0, x: 13, y: 45, r: 0, tone: "leaf" },
+    { kind: "triangle", x: 9, y: 34, r: 0, size: 56 },
+    { kind: "tag", label: 1, x: 2, y: 68, r: 0, tone: "mint" },
+    { kind: "toggle", x: 18, y: 18, r: 0, on: false },
+    { kind: "toggle", x: 27, y: 62, r: -30, on: false },
+    { kind: "tag", label: 6, x: 32, y: 44, r: 0, tone: "mint" },
+    { kind: "tag", label: 2, x: 32, y: 68, r: 0, tone: "sage" },
+    { kind: "triangle", x: 44, y: 38, r: 0, size: 52 },
+    { kind: "tag", label: 3, x: 53, y: 52, r: 8, tone: "lime" },
+    { kind: "triangle", x: 62, y: 30, r: 10, size: 52 },
+    { kind: "tag", label: 7, x: 67, y: 22, r: -14, tone: "mint" },
+    { kind: "tag", label: 4, x: 67, y: 68, r: 0, tone: "leaf" },
+    { kind: "toggle", x: 75, y: 50, r: 90, on: false },
+    { kind: "tag", label: 0, x: 79, y: 68, r: 0, tone: "sage" },
+    { kind: "triangle", x: 86, y: 34, r: 0, size: 56 },
+    { kind: "toggle", x: 89, y: 44, r: -24, on: true },
+  ],
+}
+
+const TONES: Record<Tone, string> = {
+  leaf: "bg-leaf text-ink",
+  lime: "bg-lime text-ink",
+  mint: "bg-mint text-ink",
+  sage: "bg-sage text-white",
+}
+
+const { labels, layout, class: className } = Astro.props
+const place = (item: Item) => `left:${item.x}%;top:${item.y}%;transform:rotate(${item.r}deg)`
+---
+
+<div class={cn("pointer-events-none relative select-none", className)} aria-hidden="true">
+  {LAYOUTS[layout].map((item) =>
+    item.kind === "tag" ? (
+      <span
+        class={cn(
+          "absolute rounded-md border-2 border-ink px-3 py-1 text-sm font-medium tracking-wide whitespace-nowrap uppercase sm:px-4 sm:py-1.5 sm:text-lg",
+          TONES[item.tone],
+        )}
+        style={place(item)}
+      >
+        {labels[item.label % labels.length]}
+      </span>
+    ) : item.kind === "toggle" ? (
+      <span class="absolute flex h-8 w-14 items-center rounded-full border-2 border-ink bg-white sm:h-10 sm:w-[4.5rem]" style={place(item)}>
+        <span class={cn("size-8 rounded-full border-2 border-ink sm:size-10", item.on ? "-ml-0.5 bg-leaf" : "-ml-0.5 bg-lime")}></span>
+      </span>
+    ) : (
+      <svg class="absolute text-leaf" style={`${place(item)};width:${item.size}px;height:${item.size}px`} viewBox="0 0 48 48" fill="none">
+        <path d="M24 5 L44 41 Q45 43 43 43 H5 Q3 43 4 41 Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round" />
+      </svg>
+    ),
+  )}
+</div>

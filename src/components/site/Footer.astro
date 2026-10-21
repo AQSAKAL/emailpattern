@@ -1,8 +1,10 @@
 ---
-import LinkButton from "@/components/site/LinkButton.astro"
+import Panel from "@/components/site/Panel.astro"
+import PillLink from "@/components/site/PillLink.astro"
+import TagPile from "@/components/site/TagPile.astro"
 import Wordmark from "@/components/site/Wordmark.astro"
-import { Separator } from "@/components/ui/separator"
 import { LOCALES, LOCALE_CODES, dictionary, localePath, type Locale } from "@/i18n"
+import { REPO_URL } from "@/lib/site"
 
 interface Props {
   locale: Locale
@@ -14,58 +16,65 @@ const home = localePath(locale, "/")
 const letters = [..."abcdefghijklmnopqrstuvwxyz0123456789"]
 const columns = [
   {
-    title: "EmailPattern",
+    title: t.footer.general,
     links: [
       { href: `${home}#find`, label: t.nav.find },
       { href: localePath(locale, "/patterns"), label: t.footer.formats },
+      { href: `${home}#faq`, label: t.home.faqEyebrow },
     ],
   },
   {
-    title: t.nav.api,
+    title: t.footer.developers,
     links: [
       { href: `${home}#api`, label: t.home.apiTitle },
       { href: `${home}#mcp`, label: t.home.mcpTitle },
+      { href: `${home}#cli`, label: t.home.cliTitle },
       { href: "/api/openapi.json", label: t.footer.api },
       { href: "/llms.txt", label: t.footer.llms },
+      { href: REPO_URL, label: "GitHub" },
     ],
+  },
+  {
+    title: t.footer.languages,
+    links: LOCALE_CODES.map((code) => ({ href: localePath(code, "/"), label: LOCALES[code].name })),
   },
 ]
 ---
 
-<footer class="mt-24 border-t border-border bg-band">
-  <div class="mx-auto flex max-w-6xl flex-col gap-10 px-4 py-14 sm:px-6">
-    <div class="grid gap-10 md:grid-cols-[2fr_1fr_1fr]">
-      <div class="flex flex-col gap-3">
-        <Wordmark />
-        <p class="max-w-xs text-sm text-muted-foreground">{t.footer.tagline}</p>
+<footer class="mt-28">
+  <section class="mx-auto flex max-w-4xl flex-col items-center gap-6 px-6 text-center">
+    <span class="rounded-lg border border-white/25 px-4 py-1.5 text-sm text-white/85">{t.home.ctaBadge}</span>
+    <h2 class="text-3xl font-medium tracking-tight text-balance sm:text-5xl">{t.home.ctaTitle}</h2>
+    <p class="max-w-xl text-lg text-white/70">{t.home.ctaLead}</p>
+    <PillLink tone="white" class="mt-2" href={`${home}#find`}>{t.home.ctaButton}</PillLink>
+  </section>
+
+  <TagPile labels={t.home.tags} layout="cta" class="mx-auto mt-10 hidden h-44 max-w-7xl md:block" />
+
+  <Panel class="relative z-10 mx-2 mb-2 mt-12 sm:mx-4 sm:mb-4 md:-mt-3">
+    <div class="mx-auto grid max-w-7xl gap-12 px-6 py-12 sm:px-10 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+      <div class="flex flex-col gap-5">
+        <span class="text-ink"><Wordmark /></span>
+        <p class="max-w-sm text-2xl leading-snug font-medium tracking-tight">{t.footer.tagline}</p>
+        <PillLink tone="outline-ink" class="self-start" href={`${home}#find`}>{t.home.freeCtaFind}</PillLink>
       </div>
       {columns.map((col) => (
-        <div class="flex flex-col gap-3">
-          <p class="text-sm font-semibold">{col.title}</p>
-          <ul class="flex flex-col gap-2 text-sm">
-            {col.links.map((l) => (
-              <li><a class="text-muted-foreground hover:text-foreground" href={l.href}>{l.label}</a></li>
-            ))}
+        <div class="flex flex-col gap-4">
+          <p class="eyebrow text-muted-foreground">{col.title}</p>
+          <ul class="flex flex-col gap-2.5 text-sm">
+            {col.links.map((l) => <li><a class="hover:text-sage" href={l.href}>{l.label}</a></li>)}
           </ul>
         </div>
       ))}
     </div>
-    <div class="flex flex-col gap-3">
-      <p class="text-sm font-semibold">{t.footer.browse}</p>
-      <div class="flex flex-wrap gap-0.5">
+    <div class="mx-auto flex max-w-7xl flex-col gap-3 border-t border-border px-6 py-8 sm:px-10">
+      <p class="eyebrow text-muted-foreground">{t.footer.browse}</p>
+      <div class="flex flex-wrap gap-1">
         {letters.map((letter) => (
-          <LinkButton variant="ghost" size="icon-xs" class="text-muted-foreground uppercase" href={localePath(locale, `/browse/${letter}`)}>{letter}</LinkButton>
+          <a class="flex size-7 items-center justify-center rounded-md text-sm text-muted-foreground uppercase hover:bg-mint hover:text-ink" href={localePath(locale, `/browse/${letter}`)}>{letter}</a>
         ))}
       </div>
+      <p class="mt-4 text-sm text-muted-foreground">© {new Date().getFullYear()} EmailPattern</p>
     </div>
-    <Separator />
-    <div class="flex flex-wrap items-center justify-between gap-4 text-sm text-muted-foreground">
-      <p>© {new Date().getFullYear()} EmailPattern</p>
-      <div class="flex flex-wrap gap-4">
-        {LOCALE_CODES.map((code) => (
-          <a href={localePath(code, "/")} hreflang={code} class={code === locale ? "font-medium text-foreground" : "hover:text-foreground"}>{LOCALES[code].name}</a>
-        ))}
-      </div>
-    </div>
-  </div>
+  </Panel>
 </footer>

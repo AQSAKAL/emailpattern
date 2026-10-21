@@ -1,18 +1,19 @@
 ---
-import { Check, CircleCheck } from "lucide-react"
+import { Check } from "lucide-react"
 import { AddressFormat } from "@/components/AddressFormat"
 import { CodeTabs } from "@/components/CodeTabs"
 import { Finder } from "@/components/Finder"
-import LinkButton from "@/components/site/LinkButton.astro"
 import LogoStrip from "@/components/site/LogoStrip.astro"
+import Panel from "@/components/site/Panel.astro"
+import PillLink from "@/components/site/PillLink.astro"
 import SectionHeading from "@/components/site/SectionHeading.astro"
-import { Badge } from "@/components/ui/badge"
+import TagPile from "@/components/site/TagPile.astro"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { LOCALES, dictionary, localePath, patternLabel, type Locale } from "@/i18n"
 import Base from "@/layouts/Base.astro"
 import { parseName } from "@/lib/email/names"
 import { PATTERNS, applyTemplate } from "@/lib/email/patterns"
-import { apiSamples, mcpSamples } from "@/lib/samples"
+import { apiSamples, cliSamples, mcpSamples } from "@/lib/samples"
 
 interface Props {
   locale: Locale
@@ -56,152 +57,175 @@ const jsonLd = [
 ---
 
 <Base locale={locale} title={t.home.metaTitle} description={t.site.description} path="/" jsonLd={jsonLd}>
-  <section id="find" class="scroll-mt-20 bg-gradient-to-b from-band to-background">
-    <div class="mx-auto flex max-w-6xl flex-col gap-10 px-4 pt-16 pb-16 sm:px-6 sm:pt-24">
-      <div class="flex max-w-3xl flex-col gap-5">
-        <Badge variant="outline" className="h-7 gap-1.5 self-start bg-background px-3 text-sm font-medium">
-          <CircleCheck className="size-3.5 text-positive" />
-          {t.home.badge}
-        </Badge>
-        <h1 class="text-4xl font-semibold tracking-tight text-balance sm:text-6xl">{t.home.title}</h1>
-        <p class="max-w-2xl text-lg leading-relaxed text-muted-foreground">{t.home.lead}</p>
+  <section id="find" class="scroll-mt-4 px-2 sm:px-4">
+    <div class="relative grid lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]">
+      <div class="relative">
+        <!-- The slanted right edge: a skewed white block behind the panel, wider at the bottom. -->
+        <div
+          aria-hidden="true"
+          class="absolute inset-y-0 right-0 hidden w-60 origin-top-left -translate-x-24 skew-x-[18deg] rounded-[2.25rem] bg-white lg:block"
+        >
+        </div>
+        <Panel class="relative px-6 py-10 sm:px-12 sm:py-16 lg:pr-4">
+          <div class="flex max-w-2xl flex-col gap-6">
+            <span class="eyebrow self-start rounded-full border border-ink px-3 py-1.5 text-ink">{t.home.badge}</span>
+            <h1 class="text-4xl leading-[1.05] font-medium tracking-tight text-balance sm:text-6xl">{t.home.title}</h1>
+            <p class="max-w-xl text-lg leading-relaxed text-muted-foreground">{t.home.lead}</p>
+          </div>
+          <div class="mt-10 flex max-w-3xl flex-col gap-6">
+            <Finder
+              client:load
+              t={t.finder}
+              tokens={t.tokens}
+              lang={LOCALES[locale].htmlLang}
+              domainHref={localePath(locale, "/{domain}")}
+              resultsTarget="finder-results"
+            />
+            <ul class="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
+              {t.home.facts.map((fact) => (
+                <li class="flex items-center gap-2">
+                  <span class="flex size-5 items-center justify-center rounded-full border border-ink bg-leaf text-ink"><Check className="size-3" strokeWidth={3} /></span>
+                  {fact}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </Panel>
       </div>
-      <Finder
-        client:load
-        t={t.finder}
-        tokens={t.tokens}
-        lang={LOCALES[locale].htmlLang}
-        domainHref={localePath(locale, "/{domain}")}
-      />
-      <ul class="flex flex-wrap gap-x-8 gap-y-2 text-sm text-muted-foreground">
-        {t.home.facts.map((fact) => (
-          <li class="flex items-center gap-2"><Check className="size-4 text-positive" />{fact}</li>
-        ))}
-      </ul>
+      <div class="relative hidden lg:block">
+        <TagPile labels={t.home.tags} layout="hero" class="absolute inset-x-6 bottom-10 h-80" />
+      </div>
     </div>
   </section>
 
+  <div id="finder-results" class="mx-2 mt-4 scroll-mt-4 rounded-[1.75rem] bg-white px-6 py-10 text-foreground empty:hidden sm:mx-4 sm:rounded-[2.25rem] sm:px-12"></div>
+
   <LogoStrip locale={locale} />
 
-  <div class="mx-auto flex max-w-6xl flex-col gap-28 px-4 pt-24 sm:px-6">
-    <section class="flex flex-col gap-12">
-      <SectionHeading eyebrow={t.home.howEyebrow} title={t.home.howTitle} />
-      <ol class="grid gap-10 md:grid-cols-3">
-        {t.home.how.map((step, i) => (
-          <li class="flex flex-col gap-3 border-t border-border pt-6">
-            <span class="flex size-8 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-foreground">{i + 1}</span>
-            <h3 class="text-lg font-semibold">{step.title}</h3>
-            <p class="text-sm leading-relaxed text-muted-foreground">{step.body}</p>
-          </li>
-        ))}
-      </ol>
+  <div class="flex flex-col gap-4 px-2 sm:px-4">
+    <Panel tone="mint" class="px-6 py-14 sm:px-12 sm:py-20">
+      <div class="mx-auto flex max-w-7xl flex-col gap-12">
+        <SectionHeading eyebrow={t.home.howEyebrow} title={t.home.howTitle} />
+        <ol class="grid gap-10 md:grid-cols-3">
+          {t.home.how.map((step, i) => (
+            <li class="flex flex-col gap-4 border-t-2 border-ink pt-6">
+              <span class="flex size-10 items-center justify-center rounded-full border-2 border-ink bg-leaf text-base font-semibold text-ink">{i + 1}</span>
+              <h3 class="text-xl font-medium tracking-tight">{step.title}</h3>
+              <p class="leading-relaxed text-muted-foreground">{step.body}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </Panel>
+
+    <Panel class="px-6 py-14 sm:px-12 sm:py-20">
+      <div class="mx-auto flex max-w-7xl flex-col gap-10">
+        <div class="flex flex-wrap items-end justify-between gap-6">
+          <SectionHeading eyebrow={t.home.patternsEyebrow} title={t.home.patternsTitle} lead={t.home.patternsLead} />
+          <PillLink tone="outline-ink" href={localePath(locale, "/patterns")}>{t.home.patternsAll}</PillLink>
+        </div>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="eyebrow text-muted-foreground">{t.patterns.colFormat}</TableHead>
+              <TableHead className="hidden sm:table-cell" />
+              <TableHead className="eyebrow text-right text-muted-foreground">{t.patterns.colExample}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {topPatterns.map((p) => (
+              <TableRow>
+                <TableCell className="py-4">
+                  <a href={localePath(locale, `/patterns/${p.id}`)} class="text-lg hover:underline">
+                    <AddressFormat template={p.template} labels={t.tokens} />
+                  </a>
+                </TableCell>
+                <TableCell className="hidden text-muted-foreground sm:table-cell">{patternLabel(t, p.id)}</TableCell>
+                <TableCell className="text-right font-medium">{applyTemplate(p.template, person)}@acme.com</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </Panel>
+  </div>
+
+  <div class="mx-auto flex max-w-7xl flex-col gap-24 px-6 py-24 sm:px-10">
+    <section id="api" class="grid scroll-mt-6 gap-10 lg:grid-cols-[1fr_1.4fr]">
+      <div class="flex flex-col gap-8">
+        <SectionHeading on="dark" eyebrow={t.home.apiEyebrow} title={t.home.apiTitle} lead={t.home.apiLead} />
+        <ul class="flex flex-col divide-y divide-white/10 border-y border-white/10 text-sm">
+          {endpoints.map((e) => (
+            <li class="flex items-center gap-3 py-3">
+              <span class={`eyebrow w-14 rounded-md border border-ink py-0.5 text-center text-[11px] ${e.method === "GET" ? "bg-mint text-ink" : "bg-leaf text-ink"}`}>{e.method}</span>
+              <code class="font-mono text-[13px] text-white/85">{e.path}</code>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <CodeTabs client:visible samples={apiSamples(origin, t.examplePerson.name)} copyLabel={t.finder.copy} copiedLabel={t.finder.copied} />
     </section>
 
-    <section class="flex flex-col gap-8">
-      <SectionHeading eyebrow={t.home.patternsEyebrow} title={t.home.patternsTitle} lead={t.home.patternsLead} />
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>{t.patterns.colFormat}</TableHead>
-            <TableHead className="hidden sm:table-cell" />
-            <TableHead className="text-right">{t.patterns.colExample}</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {topPatterns.map((p) => (
-            <TableRow>
-              <TableCell className="py-3.5">
-                <a href={localePath(locale, `/patterns/${p.id}`)} class="text-base hover:underline">
-                  <AddressFormat template={p.template} labels={t.tokens} />
-                </a>
-              </TableCell>
-              <TableCell className="hidden text-muted-foreground sm:table-cell">{patternLabel(t, p.id)}</TableCell>
-              <TableCell className="text-right font-medium">{applyTemplate(p.template, person)}@acme.com</TableCell>
-            </TableRow>
+    <section id="mcp" class="grid scroll-mt-6 gap-10 lg:grid-cols-[1fr_1.4fr]">
+      <div class="flex flex-col gap-8">
+        <SectionHeading on="dark" eyebrow={t.home.mcpEyebrow} title={t.home.mcpTitle} lead={t.home.mcpLead} />
+        <ol class="flex flex-col gap-3">
+          {t.home.mcpSteps.map((step, i) => (
+            <li class="flex items-center gap-3 text-white/85">
+              <span class="flex size-7 shrink-0 items-center justify-center rounded-full border-2 border-ink bg-leaf text-xs font-semibold text-ink">{i + 1}</span>
+              {step}
+            </li>
           ))}
-        </TableBody>
-      </Table>
-      <LinkButton variant="outline" class="self-start" href={localePath(locale, "/patterns")}>{t.home.patternsAll}</LinkButton>
+        </ol>
+      </div>
+      <CodeTabs client:visible samples={mcpSamples(origin)} copyLabel={t.finder.copy} copiedLabel={t.finder.copied} />
+    </section>
+
+    <section id="cli" class="grid scroll-mt-6 gap-10 lg:grid-cols-[1fr_1.4fr]">
+      <SectionHeading on="dark" eyebrow={t.home.cliEyebrow} title={t.home.cliTitle} lead={t.home.cliLead} />
+      <CodeTabs client:visible samples={cliSamples(t.examplePerson.name)} copyLabel={t.finder.copy} copiedLabel={t.finder.copied} />
     </section>
   </div>
 
-  <div class="mt-28 border-y border-border bg-band">
-    <div class="mx-auto flex max-w-6xl flex-col gap-24 px-4 py-24 sm:px-6">
-      <section id="api" class="grid scroll-mt-24 gap-10 lg:grid-cols-[1fr_1.5fr]">
-        <div class="flex flex-col gap-6">
-          <SectionHeading eyebrow={t.home.apiEyebrow} title={t.home.apiTitle} lead={t.home.apiLead} />
-          <ul class="flex flex-col divide-y divide-border border-y border-border text-sm">
-            {endpoints.map((e) => (
-              <li class="flex items-center gap-3 py-3">
-                <Badge variant={e.method === "GET" ? "secondary" : "default"} className="w-12 justify-center font-mono">{e.method}</Badge>
-                <code class="font-mono text-[13px]">{e.path}</code>
+  <div class="px-2 sm:px-4">
+    <Panel tone="lime" class="px-6 py-14 sm:px-12 sm:py-20">
+      <div class="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[1.2fr_1fr] lg:items-center">
+        <div class="flex flex-col gap-5">
+          <p class="eyebrow text-sage">{t.home.freeEyebrow}</p>
+          <h2 class="text-4xl font-medium tracking-tight sm:text-5xl">{t.home.freeTitle}</h2>
+          <p class="max-w-xl text-lg leading-relaxed text-muted-foreground">{t.home.freeLead}</p>
+          <div class="mt-3 flex flex-wrap gap-3">
+            <PillLink href={`${home}#find`}>{t.home.freeCtaFind}</PillLink>
+            <PillLink tone="outline-ink" href={`${home}#api`}>{t.home.freeCtaApi}</PillLink>
+          </div>
+        </div>
+        <div class="flex flex-col gap-6 lg:border-l-2 lg:border-ink lg:pl-12">
+          <p class="flex items-baseline gap-3">
+            <span class="text-7xl font-medium tracking-tight">{t.home.freePrice}</span>
+            <span class="text-muted-foreground">{t.home.freePriceNote}</span>
+          </p>
+          <ul class="flex flex-col gap-3">
+            {t.home.freePoints.map((point) => (
+              <li class="flex items-start gap-3">
+                <span class="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border border-ink bg-leaf"><Check className="size-3" strokeWidth={3} /></span>
+                {point}
               </li>
             ))}
           </ul>
         </div>
-        <CodeTabs client:visible samples={apiSamples(origin, t.examplePerson.name)} copyLabel={t.finder.copy} copiedLabel={t.finder.copied} />
-      </section>
-
-      <section id="mcp" class="grid scroll-mt-24 gap-10 lg:grid-cols-[1fr_1.5fr]">
-        <div class="flex flex-col gap-6">
-          <SectionHeading eyebrow={t.home.mcpEyebrow} title={t.home.mcpTitle} lead={t.home.mcpLead} />
-          <ol class="flex flex-col gap-3 text-sm">
-            {t.home.mcpSteps.map((step, i) => (
-              <li class="flex items-center gap-3">
-                <span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-accent text-xs font-semibold text-accent-foreground">{i + 1}</span>
-                {step}
-              </li>
-            ))}
-          </ol>
-        </div>
-        <CodeTabs client:visible samples={mcpSamples(origin)} copyLabel={t.finder.copy} copiedLabel={t.finder.copied} />
-      </section>
-    </div>
+      </div>
+    </Panel>
   </div>
 
-  <section class="bg-primary text-primary-foreground">
-    <div class="mx-auto grid max-w-6xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[1.2fr_1fr] lg:items-center">
-      <div class="flex flex-col gap-4">
-        <p class="text-sm font-semibold text-primary-foreground/75">{t.home.freeEyebrow}</p>
-        <h2 class="text-3xl font-semibold tracking-tight sm:text-4xl">{t.home.freeTitle}</h2>
-        <p class="max-w-xl text-lg leading-relaxed text-primary-foreground/80">{t.home.freeLead}</p>
-        <div class="mt-4 flex flex-wrap gap-3">
-          <LinkButton variant="secondary" size="lg" href={`${home}#find`}>{t.home.freeCtaFind}</LinkButton>
-          <LinkButton
-            variant="outline"
-            size="lg"
-            class="border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground dark:bg-transparent"
-            href={`${home}#api`}
-          >
-            {t.home.freeCtaApi}
-          </LinkButton>
+  <section id="faq" class="mx-auto flex max-w-7xl scroll-mt-6 flex-col gap-10 px-6 pt-24 sm:px-10">
+    <SectionHeading on="dark" eyebrow={t.home.faqEyebrow} title={t.home.faqTitle} />
+    <dl class="grid gap-x-12 md:grid-cols-2">
+      {t.home.faq.map((item) => (
+        <div class="flex flex-col gap-2 border-t border-white/15 py-6">
+          <dt class="text-lg font-medium">{item.q}</dt>
+          <dd class="leading-relaxed text-white/65">{item.a}</dd>
         </div>
-      </div>
-      <div class="flex flex-col gap-6 border-primary-foreground/20 lg:border-l lg:pl-12">
-        <p class="flex items-baseline gap-3">
-          <span class="text-6xl font-semibold tracking-tight">{t.home.freePrice}</span>
-          <span class="text-primary-foreground/75">{t.home.freePriceNote}</span>
-        </p>
-        <ul class="flex flex-col gap-3">
-          {t.home.freePoints.map((point) => (
-            <li class="flex items-start gap-3"><Check className="mt-0.5 size-5 shrink-0" />{point}</li>
-          ))}
-        </ul>
-      </div>
-    </div>
+      ))}
+    </dl>
   </section>
-
-  <div class="mx-auto max-w-6xl px-4 pt-24 sm:px-6">
-    <section class="flex flex-col gap-10">
-      <SectionHeading eyebrow={t.home.faqEyebrow} title={t.home.faqTitle} />
-      <dl class="grid gap-x-12 md:grid-cols-2">
-        {t.home.faq.map((item) => (
-          <div class="flex flex-col gap-2 border-t border-border py-6">
-            <dt class="text-base font-semibold">{item.q}</dt>
-            <dd class="text-sm leading-relaxed text-muted-foreground">{item.a}</dd>
-          </div>
-        ))}
-      </dl>
-    </section>
-  </div>
 </Base>

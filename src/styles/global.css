@@ -1,38 +1,31 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/inter";
-
-@custom-variant dark (&:is(.dark *));
+@import "@fontsource-variable/figtree";
 
 /*
-  Business classic: white and slate, one navy accent, Inter throughout.
-  Sections are separated by hairlines and tinted bands, never boxed cards.
-  The address tokens keep their own colours so a format reads at a glance.
+  Forest frame on a pale lime page. Content sits on large rounded panels (white,
+  mint or lime) inside the dark green frame. Black pill buttons, outline pill
+  badges, uppercase eyebrows, and piles of tilted outlined tags as decoration.
+  One light theme: the frame is already dark, so there is no separate dark mode.
 */
 
 @theme inline {
-    --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+    --font-sans: 'Figtree Variable', ui-sans-serif, system-ui, sans-serif;
     --font-heading: var(--font-sans);
     --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+    --color-frame: var(--frame);
+    --color-forest: var(--forest);
+    --color-forest-deep: var(--forest-deep);
+    --color-leaf: var(--leaf);
+    --color-sage: var(--sage);
+    --color-lime: var(--lime);
+    --color-mint: var(--mint);
+    --color-ink: var(--ink);
     --color-token-first: var(--token-first);
     --color-token-last: var(--token-last);
     --color-token-initial: var(--token-initial);
-    --color-band: var(--band);
     --color-positive: var(--positive);
-    --color-sidebar-ring: var(--sidebar-ring);
-    --color-sidebar-border: var(--sidebar-border);
-    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-    --color-sidebar-accent: var(--sidebar-accent);
-    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-    --color-sidebar-primary: var(--sidebar-primary);
-    --color-sidebar-foreground: var(--sidebar-foreground);
-    --color-sidebar: var(--sidebar);
-    --color-chart-5: var(--chart-5);
-    --color-chart-4: var(--chart-4);
-    --color-chart-3: var(--chart-3);
-    --color-chart-2: var(--chart-2);
-    --color-chart-1: var(--chart-1);
     --color-ring: var(--ring);
     --color-input: var(--input);
     --color-border: var(--border);
@@ -61,82 +54,41 @@
 }
 
 :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.21 0.03 264);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.21 0.03 264);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.21 0.03 264);
-    --primary: oklch(0.4 0.14 262);
-    --primary-foreground: oklch(0.985 0.003 250);
-    --secondary: oklch(0.967 0.006 255);
-    --secondary-foreground: oklch(0.27 0.04 262);
-    --muted: oklch(0.967 0.006 255);
-    --muted-foreground: oklch(0.5 0.025 260);
-    --accent: oklch(0.955 0.015 255);
-    --accent-foreground: oklch(0.32 0.1 262);
-    --destructive: oklch(0.55 0.2 27);
-    --border: oklch(0.91 0.008 255);
-    --input: oklch(0.87 0.01 255);
-    --ring: oklch(0.55 0.14 262);
-    --band: oklch(0.978 0.005 255);
-    --positive: oklch(0.52 0.12 155);
-    --token-first: oklch(0.42 0.15 262);
-    --token-last: oklch(0.5 0.1 200);
-    --token-initial: oklch(0.52 0.06 290);
-    --chart-1: oklch(0.4 0.14 262);
-    --chart-2: oklch(0.5 0.1 200);
-    --chart-3: oklch(0.52 0.06 290);
-    --chart-4: oklch(0.7 0.1 80);
-    --chart-5: oklch(0.6 0.02 260);
-    --radius: 0.5rem;
-    --sidebar: oklch(0.985 0.003 250);
-    --sidebar-foreground: oklch(0.21 0.03 264);
-    --sidebar-primary: oklch(0.4 0.14 262);
-    --sidebar-primary-foreground: oklch(0.985 0.003 250);
-    --sidebar-accent: oklch(0.955 0.015 255);
-    --sidebar-accent-foreground: oklch(0.32 0.1 262);
-    --sidebar-border: oklch(0.91 0.008 255);
-    --sidebar-ring: oklch(0.55 0.14 262);
-}
+    /* Page and frame */
+    --frame: oklch(0.965 0.075 122);
+    --forest: oklch(0.29 0.045 168);
+    --forest-deep: oklch(0.23 0.04 168);
+    /* Accents taken from the tag piles */
+    --leaf: oklch(0.79 0.17 148);
+    --sage: oklch(0.58 0.05 168);
+    --lime: oklch(0.95 0.08 118);
+    --mint: oklch(0.975 0.02 150);
+    --ink: oklch(0.17 0.02 168);
 
-.dark {
-    --background: oklch(0.17 0.02 264);
-    --foreground: oklch(0.96 0.005 255);
-    --card: oklch(0.2 0.022 264);
-    --card-foreground: oklch(0.96 0.005 255);
-    --popover: oklch(0.2 0.022 264);
-    --popover-foreground: oklch(0.96 0.005 255);
-    --primary: oklch(0.72 0.12 258);
-    --primary-foreground: oklch(0.17 0.02 264);
-    --secondary: oklch(0.25 0.022 264);
-    --secondary-foreground: oklch(0.96 0.005 255);
-    --muted: oklch(0.25 0.022 264);
-    --muted-foreground: oklch(0.7 0.02 260);
-    --accent: oklch(0.27 0.04 262);
-    --accent-foreground: oklch(0.96 0.005 255);
-    --destructive: oklch(0.68 0.18 27);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 16%);
-    --ring: oklch(0.72 0.12 258);
-    --band: oklch(0.2 0.022 264);
-    --positive: oklch(0.72 0.13 155);
-    --token-first: oklch(0.76 0.12 258);
-    --token-last: oklch(0.78 0.09 200);
-    --token-initial: oklch(0.76 0.06 290);
-    --chart-1: oklch(0.72 0.12 258);
-    --chart-2: oklch(0.78 0.09 200);
-    --chart-3: oklch(0.76 0.06 290);
-    --chart-4: oklch(0.8 0.1 80);
-    --chart-5: oklch(0.7 0.02 260);
-    --sidebar: oklch(0.2 0.022 264);
-    --sidebar-foreground: oklch(0.96 0.005 255);
-    --sidebar-primary: oklch(0.72 0.12 258);
-    --sidebar-primary-foreground: oklch(0.17 0.02 264);
-    --sidebar-accent: oklch(0.27 0.04 262);
-    --sidebar-accent-foreground: oklch(0.96 0.005 255);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.72 0.12 258);
+    /* shadcn tokens, for content on white panels */
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.17 0.02 168);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.17 0.02 168);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.17 0.02 168);
+    --primary: oklch(0.17 0.02 168);
+    --primary-foreground: oklch(0.99 0.005 150);
+    --secondary: oklch(0.96 0.02 150);
+    --secondary-foreground: oklch(0.25 0.04 168);
+    --muted: oklch(0.96 0.015 150);
+    --muted-foreground: oklch(0.47 0.03 168);
+    --accent: oklch(0.95 0.08 118);
+    --accent-foreground: oklch(0.25 0.04 168);
+    --destructive: oklch(0.55 0.2 27);
+    --border: oklch(0.9 0.015 160);
+    --input: oklch(0.85 0.02 160);
+    --ring: oklch(0.6 0.15 150);
+    --positive: oklch(0.6 0.17 148);
+    --token-first: oklch(0.45 0.12 158);
+    --token-last: oklch(0.42 0.1 220);
+    --token-initial: oklch(0.55 0.06 140);
+    --radius: 0.75rem;
 }
 
 @layer base {
@@ -147,14 +99,17 @@
     @apply font-sans;
     color-scheme: light;
   }
-  html.dark {
-    color-scheme: dark;
-  }
   body {
-    @apply bg-background text-foreground antialiased;
-    font-feature-settings: "cv11", "ss01";
+    @apply bg-frame text-foreground antialiased;
   }
   button:not(:disabled), [role="button"]:not(:disabled) {
     cursor: pointer;
+  }
+}
+
+@layer components {
+  /* Small uppercase label above headings and inside pills. */
+  .eyebrow {
+    @apply text-xs font-semibold tracking-[0.12em] uppercase;
   }
 }

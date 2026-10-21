@@ -28,3 +28,8 @@ data/
 
 # local tooling
 .claude/
+
+# Python CLI
+.venv/
+__pycache__/
+.pytest_cache/

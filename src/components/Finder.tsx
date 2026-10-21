@@ -1,4 +1,5 @@
-import { useState, type FormEvent } from "react"
+import { useEffect, useState, type FormEvent } from "react"
+import { createPortal } from "react-dom"
 import { ArrowRight, Check, CircleAlert, Copy, MailCheck, Search } from "lucide-react"
 import { AddressFormat, type TokenLabels } from "@/components/AddressFormat"
 import { LikelihoodBar } from "@/components/LikelihoodBar"
@@ -11,6 +12,7 @@ import type { FinderStrings } from "@/i18n/dictionaries/en"
 import { fill } from "@/i18n/fill"
 import { formatShare } from "@/i18n/format"
 import { patternById } from "@/lib/email/patterns"
+import { cn } from "@/lib/utils"
 import type { FindResult } from "@/server/find"
 
 type State =
@@ -27,13 +29,24 @@ export interface FinderProps {
   /** Where a domain's page lives in this language, with {domain} in it. */
   domainHref: string
   defaultDomain?: string
+  /** Id of an element elsewhere on the page to show results in; inline when absent. */
+  resultsTarget?: string
 }
 
-export function Finder({ t, tokens, lang, domainHref, defaultDomain = "" }: FinderProps) {
+export function Finder({ t, tokens, lang, domainHref, defaultDomain = "", resultsTarget }: FinderProps) {
   const [name, setName] = useState("")
   const [domain, setDomain] = useState(defaultDomain)
   const [state, setState] = useState<State>({ kind: "idle" })
+  const [target, setTarget] = useState<HTMLElement | null>(null)
   const share = (value: number) => formatShare(lang, value)
+
+  useEffect(() => {
+    if (resultsTarget) setTarget(document.getElementById(resultsTarget))
+  }, [resultsTarget])
+
+  useEffect(() => {
+    if (state.kind === "done" && target) target.scrollIntoView({ behavior: "smooth", block: "start" })
+  }, [state, target])
 
   async function submit(event: FormEvent) {
     event.preventDefault()
@@ -63,7 +76,7 @@ export function Finder({ t, tokens, lang, domainHref, defaultDomain = "" }: Find
             onChange={(e) => setName(e.target.value)}
             placeholder={t.namePlaceholder}
             autoComplete="off"
-            className="h-11 bg-background text-base md:text-base"
+            className="h-12 rounded-xl bg-white text-base md:text-base"
           />
         </div>
         <div className="flex flex-col gap-2">
@@ -76,10 +89,10 @@ export function Finder({ t, tokens, lang, domainHref, defaultDomain = "" }: Find
             required
             autoCapitalize="none"
             spellCheck={false}
-            className="h-11 bg-background text-base md:text-base"
+            className="h-12 rounded-xl bg-white text-base md:text-base"
           />
         </div>
-        <Button type="submit" size="lg" disabled={state.kind === "loading"} className="h-11 px-6">
+        <Button type="submit" size="lg" disabled={state.kind === "loading"} className="eyebrow h-12 rounded-full bg-ink px-7 text-white hover:bg-ink/85">
           <Search data-icon="inline-start" />
           {state.kind === "loading" ? t.searching : t.submit}
         </Button>
@@ -91,7 +104,10 @@ export function Finder({ t, tokens, lang, domainHref, defaultDomain = "" }: Find
         </p>
       )}
 
-      {state.kind === "done" && <Result result={state.result} t={t} tokens={tokens} share={share} domainHref={domainHref} />}
+      {state.kind === "done" &&
+        (target
+          ? createPortal(<Result result={state.result} t={t} tokens={tokens} share={share} domainHref={domainHref} framed={false} />, target)
+          : <Result result={state.result} t={t} tokens={tokens} share={share} domainHref={domainHref} />)}
     </div>
   )
 }
@@ -102,7 +118,9 @@ function Result({
   tokens,
   share,
   domainHref,
+  framed = true,
 }: {
+  framed?: boolean
   result: FindResult
   t: FinderStrings
   tokens: TokenLabels
@@ -122,15 +140,15 @@ function Result({
   }
 
   return (
-    <section aria-live="polite" className="flex flex-col gap-8 border-t border-border pt-8 animate-in fade-in slide-in-from-bottom-2">
+    <section aria-live="polite" className={cn("flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-2", framed && "border-t border-border pt-8")}>
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-2">
-          <p className="text-sm font-medium text-muted-foreground">{top.email ? t.mostLikely : fill(t.formatsAt, { domain })}</p>
-          {result.known_domain && <Badge variant="secondary">{share(top.confidence)}</Badge>}
+          <p className="eyebrow text-sage">{top.email ? t.mostLikely : fill(t.formatsAt, { domain })}</p>
+          {result.known_domain && <Badge className="border border-ink bg-leaf text-ink">{share(top.confidence)}</Badge>}
         </div>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
           {top.email ? (
-            <p className="text-2xl font-semibold tracking-tight break-all sm:text-3xl">{top.email}</p>
+            <p className="text-3xl font-medium tracking-tight break-all sm:text-4xl">{top.email}</p>
           ) : (
             <AddressFormat template={topTemplate} domain={domain} labels={tokens} className="text-2xl font-semibold sm:text-3xl" />
           )}
@@ -153,7 +171,7 @@ function Result({
 
       {rest.length > 0 && (
         <div className="flex flex-col gap-3">
-          <p className="text-sm font-semibold">{t.alternatives}</p>
+          <p className="eyebrow text-muted-foreground">{t.alternatives}</p>
           <Table>
             <TableHeader>
               <TableRow>

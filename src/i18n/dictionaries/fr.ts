@@ -6,6 +6,9 @@ export const fr: Dictionary = {
   },
   nav: { find: "Chercher", patterns: "Formats", api: "API", mcp: "MCP", language: "Langue", cta: "API gratuite" },
   footer: {
+    general: "Général",
+    developers: "Développeurs",
+    languages: "Langues",
     tagline: "Le format e-mail de chaque entreprise, gratuitement.",
     browse: "Parcourir les entreprises",
     formats: "Tous les formats",
@@ -46,6 +49,11 @@ export const fr: Dictionary = {
   },
 
   home: {
+    tags: ["prenom.nom", "Gratuit pour toujours", "Sans inscription", "Vérification MX", "Recherche en masse", "API REST", "Serveur MCP", "15 formats"],
+    ctaBadge: "Gratuit pour tous",
+    ctaTitle: "Prêt à trouver la bonne adresse ?",
+    ctaLead: "Saisissez un nom et le site d'une entreprise. Vous obtenez le format, l'adresse et sa probabilité, gratuitement et sans compte.",
+    ctaButton: "Trouver une adresse",
     metaTitle: "Trouveur de format e-mail gratuit : l'adresse professionnelle de n'importe qui",
     badge: "Gratuit · Sans inscription · Sans carte bancaire",
     title: "Trouvez l'adresse e-mail professionnelle de n'importe qui.",
@@ -70,6 +78,9 @@ export const fr: Dictionary = {
     mcpTitle: "Serveur MCP",
     mcpLead: "Donnez à Claude, Cursor ou tout client MCP l'outil find_email. Il trouve formats et adresses pour des listes entières de personnes.",
     mcpSteps: ["Ajoutez le serveur à votre client", "Demandez des adresses en langage courant", "Votre agent reçoit chaque adresse avec sa probabilité"],
+    cliEyebrow: "Pour le terminal",
+    cliTitle: "Ligne de commande",
+    cliLead: "Cherchez des personnes depuis votre terminal, ou complétez tout un CSV d'adresses en une commande. Gratuit, sans clé.",
     freeEyebrow: "Tarifs",
     freeTitle: "Gratuit. Sans piège.",
     freeLead: "Le site, l'API et le serveur MCP sont gratuits. Aucun compte à créer, rien à payer.",

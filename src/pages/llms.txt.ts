@@ -24,6 +24,11 @@ Answers are inferred from each company's format, with a confidence between 0 and
 - GET ${origin}/api/v1/domains/acme.com
 - OpenAPI: ${origin}/api/openapi.json
 
+## CLI
+
+- uv tool install "git+https://github.com/AQSAKAL/emailpattern#subdirectory=cli"
+- emailpattern find "Jane Doe" acme.com · emailpattern domain acme.com · emailpattern bulk leads.csv
+
 ## Pages
 
 - ${origin}/{domain} — a company's formats, e.g. ${origin}/acme.com

@@ -6,6 +6,9 @@ export const es: Dictionary = {
   },
   nav: { find: "Buscar", patterns: "Formatos", api: "API", mcp: "MCP", language: "Idioma", cta: "API gratuita" },
   footer: {
+    general: "General",
+    developers: "Desarrolladores",
+    languages: "Idiomas",
     tagline: "El formato de correo de cada empresa, gratis.",
     browse: "Explorar empresas",
     formats: "Todos los formatos",
@@ -46,6 +49,11 @@ export const es: Dictionary = {
   },
 
   home: {
+    tags: ["nombre.apellido", "Gratis siempre", "Sin registro", "Comprobación MX", "Búsquedas masivas", "API REST", "Servidor MCP", "15 formatos"],
+    ctaBadge: "Gratis para todos",
+    ctaTitle: "¿Listo para encontrar la dirección correcta?",
+    ctaLead: "Escribe un nombre y la web de una empresa. Obtienes el formato, la dirección y su probabilidad, gratis y sin cuenta.",
+    ctaButton: "Buscar una dirección",
     metaTitle: "Buscador gratuito de formatos de correo: el email profesional de cualquiera",
     badge: "Gratis · Sin registro · Sin tarjeta",
     title: "Encuentra el correo profesional de cualquier persona.",
@@ -70,6 +78,9 @@ export const es: Dictionary = {
     mcpTitle: "Servidor MCP",
     mcpLead: "Dale a Claude, Cursor o cualquier cliente MCP la herramienta find_email. Busca formatos y direcciones para listas enteras de personas.",
     mcpSteps: ["Añade el servidor a tu cliente", "Pide direcciones en lenguaje natural", "Tu agente recibe cada dirección con su probabilidad"],
+    cliEyebrow: "Para la terminal",
+    cliTitle: "Línea de comandos",
+    cliLead: "Busca personas desde tu terminal, o rellena un CSV entero con direcciones en un solo comando. Gratis, sin clave.",
     freeEyebrow: "Precio",
     freeTitle: "Gratis. Sin trampa.",
     freeLead: "La web, la API y el servidor MCP son gratuitos. No hay que crear cuenta ni pagar nada.",

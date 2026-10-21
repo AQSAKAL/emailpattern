@@ -1,0 +1,16 @@
+---
+import { cn } from "@/lib/utils"
+
+interface Props {
+  tone?: "white" | "mint" | "lime"
+  class?: string
+  id?: string
+}
+
+const { tone = "white", class: className, id } = Astro.props
+const tones = { white: "bg-white", mint: "bg-mint", lime: "bg-lime" }
+---
+
+<div id={id} class={cn("rounded-[1.75rem] text-foreground sm:rounded-[2.25rem]", tones[tone], className)}>
+  <slot />
+</div>
