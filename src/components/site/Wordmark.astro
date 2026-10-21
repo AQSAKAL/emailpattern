@@ -8,12 +8,11 @@ interface Props {
 }
 
 const { on = "dark" } = Astro.props
-const brace = on === "dark" ? "text-leaf" : "text-sage"
 ---
 
 <span class="flex items-center gap-2.5">
-  <LogoMark class="size-9 shrink-0 -rotate-6 transition-transform group-hover:rotate-0" />
+  <LogoMark class="size-9 shrink-0" on={on} />
   <span class="text-xl font-semibold tracking-tight">
-    email<span class={cn("font-normal", brace)}>{"{"}</span>pattern<span class={cn("font-normal", brace)}>{"}"}</span>
+    email<span class={cn("font-normal", on === "dark" ? "text-white/75" : "text-muted-foreground")}>pattern</span>
   </span>
 </span>
