@@ -1,13 +1,14 @@
 // What the usage log records, as pure calculations: classify a request, hash the
 // caller, build the event rows. Writing them to disk is src/server/usage-log.ts.
 //
-// Privacy by construction: no query strings, no person names and no raw IPs ever
-// reach an event. Lookups keep the normalised company domain and whether a name
-// was given, nothing more.
+// No query strings and no person names ever reach an event: the query string carries
+// the typed name. Requests keep the caller's IP, country and network; lookups keep the
+// normalised company domain and whether a name was given, nothing more.
 
 import { createHmac } from "node:crypto"
 import { DEFAULT_LOCALE, isLocale, type Locale } from "../i18n/locales"
 import { normalizeDomain } from "./email/domains"
+import { NO_GEO, type Geo } from "./geo"
 
 export type Surface = "page" | "api" | "mcp" | "api_doc" | "seo_file" | "asset"
 
@@ -108,7 +109,7 @@ export function classifyAgent(userAgent: string): { family: string; kind: AgentK
   return { family: "other", kind: "unknown" }
 }
 
-/** A stable keyed hash of the caller's IP: repeat users stay recognisable, the address itself is not kept. */
+/** A stable keyed hash of the caller's IP, kept so rows from before raw IPs were logged still group by caller. */
 export function hashIp(ip: string, secret: string): string {
   return createHmac("sha256", secret).update(ip).digest("hex").slice(0, 16)
 }
@@ -141,7 +142,7 @@ export function describeRpc(body: unknown): RequestExtra {
   }
 }
 
-export interface RequestEvent extends RequestExtra {
+export interface RequestEvent extends RequestExtra, Geo {
   ts: string
   id: string
   method: string
@@ -152,11 +153,17 @@ export interface RequestEvent extends RequestExtra {
   domain: string | null
   status: number
   ms: number
+  ip: string
   ip_hash: string
+  /** The Host header, so www and the bare domain can be told apart. */
+  host: string | null
   ua: string
   agent: string
   agent_kind: AgentKind
+  accept_language: string | null
   referrer_host: string | null
+  /** The referring page without its query string or fragment. */
+  referrer: string | null
 }
 
 export interface RequestInput {
@@ -169,14 +176,17 @@ export interface RequestInput {
   ip: string
   userAgent: string | null
   referer: string | null
+  host?: string | null
+  acceptLanguage?: string | null
+  geo?: Geo
   secret: string
   extra?: RequestExtra
 }
 
-function hostOf(referer: string | null): string | null {
+function parseReferer(referer: string | null): URL | null {
   if (!referer) return null
   try {
-    return new URL(referer).host.slice(0, 100)
+    return new URL(referer)
   } catch {
     return null
   }
@@ -186,6 +196,7 @@ export function buildRequestEvent(input: RequestInput): RequestEvent {
   const info = classifyPath(input.url.pathname)
   const ua = (input.userAgent ?? "").slice(0, 300)
   const agent = classifyAgent(ua)
+  const referer = parseReferer(input.referer)
   return {
     ts: input.now.toISOString(),
     id: input.id,
@@ -198,11 +209,16 @@ export function buildRequestEvent(input: RequestInput): RequestEvent {
     domain: info.domain,
     status: input.status,
     ms: Math.round(input.ms * 10) / 10,
+    ip: input.ip.slice(0, 64),
     ip_hash: hashIp(input.ip, input.secret),
+    ...(input.geo ?? NO_GEO),
+    host: text(input.host),
     ua,
     agent: agent.family,
     agent_kind: agent.kind,
-    referrer_host: hostOf(input.referer),
+    accept_language: text(input.acceptLanguage),
+    referrer_host: referer ? referer.host.slice(0, 100) : null,
+    referrer: referer ? `${referer.origin}${referer.pathname}`.slice(0, 300) : null,
     ...(input.extra ?? NO_EXTRA),
   }
 }

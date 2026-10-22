@@ -53,3 +53,7 @@ docker compose exec emailpattern-web npm run import -- /data/samples.jsonl
 ```
 
 Point your proxy for your domain at `emailpattern-web:4321` and set `TRUST_PROXY=1` (already set in the image).
+
+The usage log in `/data/usage` records each request's IP with its country and network, looked up
+in [DB-IP Lite](https://db-ip.com) (CC BY 4.0). The app downloads those files into `/data/geo` by
+itself and refreshes them monthly.

@@ -91,12 +91,27 @@ describe("buildRequestEvent", () => {
     secret: "s3cret",
   }
 
-  it("keeps the query string, names and the raw IP out of the row", () => {
-    const row = JSON.stringify(buildRequestEvent(input))
+  it("keeps the query string and names out of the row", () => {
+    const row = JSON.stringify(buildRequestEvent({ ...input, referer: "https://emailpattern.com/acme.com?name=Jane%20Doe#x" }))
     expect(row).not.toContain("Jane")
     expect(row).not.toContain("name=")
-    expect(row).not.toContain("203.0.113.7")
-    expect(row).not.toContain("/some/article")
+  })
+
+  it("keeps the caller's IP, network and headers", () => {
+    const geo = { country: "SE", asn: 3301, as_org: "Telia Company AB" }
+    expect(buildRequestEvent({ ...input, geo, host: "www.emailpattern.com", acceptLanguage: "sv-SE,sv;q=0.9" })).toMatchObject({
+      ip: "203.0.113.7",
+      country: "SE",
+      asn: 3301,
+      as_org: "Telia Company AB",
+      host: "www.emailpattern.com",
+      accept_language: "sv-SE,sv;q=0.9",
+      referrer: "https://news.example/some/article",
+    })
+  })
+
+  it("leaves the network empty when it is unknown", () => {
+    expect(buildRequestEvent(input)).toMatchObject({ country: null, asn: null, as_org: null, host: null, accept_language: null })
   })
 
   it("fills the classified columns", () => {

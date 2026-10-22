@@ -77,6 +77,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
         ip,
         userAgent: context.request.headers.get("user-agent"),
         referer: context.request.headers.get("referer"),
+        host: context.request.headers.get("host"),
+        acceptLanguage: context.request.headers.get("accept-language"),
       })
     }
   })

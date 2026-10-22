@@ -2,6 +2,7 @@ import { randomBytes } from "node:crypto"
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { resolve } from "node:path"
 import { buildLookupEvent, buildRequestEvent, type RequestEvent } from "../lib/usage"
+import { lookupGeo } from "./geo"
 import { currentRequest, type RequestContext } from "./request-context"
 import { createUsageLog, type UsageLog } from "./usage-log"
 
@@ -53,13 +54,15 @@ export interface RecordedRequest {
   ip: string
   userAgent: string | null
   referer: string | null
+  host: string | null
+  acceptLanguage: string | null
 }
 
 export function logRequest(recorded: RecordedRequest): void {
   const { log, secret } = usage()
   if (!log) return
   const { request, ...rest } = recorded
-  log.request(buildRequestEvent({ now: new Date(), id: request.id, secret, extra: request.extra, ...rest }) satisfies RequestEvent)
+  log.request(buildRequestEvent({ now: new Date(), id: request.id, secret, extra: request.extra, geo: lookupGeo(rest.ip), ...rest }) satisfies RequestEvent)
 }
 
 interface LookupLike {
