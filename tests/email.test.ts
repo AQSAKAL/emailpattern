@@ -42,7 +42,7 @@ describe("normalizeDomain", () => {
     expect(normalizeDomain(input)).toBe(expected)
   })
 
-  it.each(["", "acme", "acme.c0m", "-acme.com", "http://", "a b.com"])("rejects %j", (input) => {
+  it.each(["", "acme", "acme.c0m", "-acme.com", "http://", "a b.com", "logo@2x.png", "hero.jpg", "x.webp"])("rejects %j", (input) => {
     expect(normalizeDomain(input)).toBeNull()
   })
 })

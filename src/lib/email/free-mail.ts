@@ -11,6 +11,8 @@ const FREE_MAIL = new Set([
   "wanadoo.fr", "sfr.fr", "telenet.be", "skynet.be", "online.no", "libero.it", "tiscali.it", "virgilio.it",
   "seznam.cz", "centrum.cz", "wp.pl", "o2.pl", "onet.pl", "interia.pl", "zoho.com", "qq.com", "163.com",
   "126.com", "fastmail.com", "tutanota.com", "hey.com", "telia.com", "jubii.dk", "ofir.dk", "post.cz", "abv.bg",
+  // Shared certified-mail and ISP mailboxes seen in crawled pages (Oct 22 2026).
+  "pec.it", "legalmail.it", "arubapec.it", "registerpec.it", "postacert.it", "aruba.it", "alice.it", "tin.it", "fastwebnet.it", "bluewin.ch", "sunrise.ch", "hispeed.ch", "gmx.ch", "mail.dk", "email.cz", "atlas.cz", "volny.cz", "azet.sk", "zoznam.sk", "post.sk", "inbox.lt", "one.lt", "mail.lv", "kpnmail.nl", "ziggo.nl", "planet.nl", "hetnet.nl", "home.nl", "chello.nl", "xs4all.nl", "pandora.be", "eircom.net", "btinternet.com", "sky.com", "virginmedia.com", "ntlworld.com", "talktalk.net", "neuf.fr", "bbox.fr", "comhem.se", "bredband.net", "tele2.se", "telia.se", "spray.se", "get2net.dk", "stofanet.dk", "webspeed.dk", "c.dk", "tdcadsl.dk", "outlook.it", "hotmail.no", "live.no", "online.de", "arcor.de", "vodafone.de", "posteo.de", "mailbox.org", "gmx.fr", "laposte.fr",
 ])
 
 export function isFreeMail(domain: string): boolean {

@@ -59,6 +59,8 @@ describe("isFreeMail", () => {
     expect(isFreeMail("gmail.com")).toBe(true)
     expect(isFreeMail("Hot.ee")).toBe(true)
     expect(isFreeMail("acme.com")).toBe(false)
+    expect(isFreeMail("pec.it")).toBe(true)
+    expect(isFreeMail("bluewin.ch")).toBe(true)
   })
 })
 
