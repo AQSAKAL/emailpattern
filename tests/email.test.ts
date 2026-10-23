@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { rankCandidates, patternShares } from "../src/lib/email/candidates"
+import { isMixedEvidence, rankCandidates, patternShares } from "../src/lib/email/candidates"
 import { normalizeDomain } from "../src/lib/email/domains"
 import { inferDomainPatterns, matchPatterns } from "../src/lib/email/infer"
 import { mailHostName } from "../src/lib/email/mail-host"
@@ -158,5 +158,13 @@ describe("spreadsheetFormula", () => {
 describe("renameTokens", () => {
   it("writes token names in the page's language", () => {
     expect(renameTokens("{f}.{last}", { first: "prenom", last: "nom", f: "p", l: "n" })).toBe("{p}.{nom}")
+  })
+})
+
+describe("isMixedEvidence", () => {
+  it("calls a top format under half the evidence mixed", () => {
+    expect(isMixedEvidence(0.29)).toBe(true)
+    expect(isMixedEvidence(0.5)).toBe(false)
+    expect(isMixedEvidence(0.91)).toBe(false)
   })
 })

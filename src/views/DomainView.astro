@@ -12,7 +12,7 @@ import { parseName } from "@/lib/email/names"
 import { applyTemplate, patternById, renameTokens } from "@/lib/email/patterns"
 import { INDEXABLE_MIN_SAMPLES, getStore } from "@/server/db"
 import { domainContext } from "@/server/find"
-import { rankCandidates } from "@/lib/email/candidates"
+import { rankCandidates, isMixedEvidence } from "@/lib/email/candidates"
 
 interface Props {
   locale: Locale
@@ -34,17 +34,18 @@ const topTemplate = patternById(top.patternId)!.template
 const example = `${applyTemplate(topTemplate, person)}@${domain}`
 const templateText = `${renameTokens(topTemplate, t.tokens)}@${domain}`
 const share = formatPercent(locale, top.confidence)
+const mixed = known && isMixedEvidence(top.confidence)
 const related = known ? store.domainsUsingPattern(top.patternId, 12, domain) : []
 const path = `/${domain}`
 
 const title = known ? fill(t.domain.metaTitle, { domain, example }) : fill(t.domain.metaTitleUnknown, { domain })
 const description = known
-  ? fill(t.domain.metaDescription, { domain, company, template: templateText, share })
+  ? fill(mixed ? t.domain.metaDescriptionMixed : t.domain.metaDescription, { domain, company, template: templateText, share })
   : fill(t.domain.metaDescriptionUnknown, { domain })
 
 const faq = [
   ...(known
-    ? [{ q: fill(t.domain.faqFormatQ, { domain }), a: fill(t.domain.faqFormatA, { company, example, template: templateText, share }) }]
+    ? [{ q: fill(t.domain.faqFormatQ, { domain }), a: fill(mixed ? t.domain.faqFormatAMixed : t.domain.faqFormatA, { company, example, template: templateText, share }) }]
     : []),
   { q: fill(t.domain.faqFindQ, { domain }), a: fill(t.domain.faqFindA, { domain }) },
   ...(mail.acceptsMail === null
@@ -96,7 +97,7 @@ const jsonLd = [
       </h1>
       <p class="max-w-3xl text-lg leading-relaxed">
         {known ? (
-          splitPlaceholders(fill(t.domain.leadKnown, { company, person: t.examplePerson.name })).map((part) =>
+          splitPlaceholders(fill(mixed ? t.domain.leadMixed : t.domain.leadKnown, { company, person: t.examplePerson.name, share })).map((part) =>
             typeof part === "string" ? part
             : part.key === "template" ? <AddressFormat template={topTemplate} domain={domain} labels={t.tokens} />
             : <strong class="font-semibold text-token-first">{example}</strong>,

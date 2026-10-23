@@ -66,3 +66,11 @@ export function rankCandidates(
     .sort((a, b) => b.confidence - a.confidence)
     .slice(0, limit)
 }
+
+/** Below this share the top format is only the most common one, not what most people use. */
+export const MAJORITY_SHARE = 0.5
+
+/** Whether a domain's evidence is split, so pages should not state its top format as the rule. */
+export function isMixedEvidence(topShare: number): boolean {
+  return topShare < MAJORITY_SHARE
+}
