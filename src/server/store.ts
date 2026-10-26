@@ -161,6 +161,29 @@ export function openStore(path: string) {
       }
     },
 
+    /** Every domain name in the store, for one-off clean-ups. */
+    allDomains(): string[] {
+      return (db.prepare("SELECT domain FROM domains").all() as Row[]).map((r) => r.domain as string)
+    },
+
+    /** Removes domains and their patterns; returns how many were there. */
+    deleteDomains(domains: readonly string[]): number {
+      const deleteDomain = db.prepare("DELETE FROM domains WHERE domain = ?")
+      let removed = 0
+      db.exec("BEGIN")
+      try {
+        for (const domain of domains) {
+          deletePatterns.run(domain)
+          removed += Number(deleteDomain.run(domain).changes)
+        }
+        db.exec("COMMIT")
+      } catch (error) {
+        db.exec("ROLLBACK")
+        throw error
+      }
+      return removed
+    },
+
     getMailHost(domain: string): MailHost | null {
       const row = selectMailHost.get(domain) as Row | undefined
       if (!row) return null

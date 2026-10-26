@@ -9,10 +9,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { LOCALES, dictionary, fill, splitPlaceholders, formatNumber, formatPercent, localePath, type Locale } from "@/i18n"
 import Base from "@/layouts/Base.astro"
 import { parseName } from "@/lib/email/names"
-import { applyTemplate, patternById, renameTokens } from "@/lib/email/patterns"
+import { applyTemplate, patternById, renameTokens, plainTemplate } from "@/lib/email/patterns"
 import { INDEXABLE_MIN_SAMPLES, getStore } from "@/server/db"
 import { domainContext } from "@/server/find"
 import { rankCandidates, isMixedEvidence } from "@/lib/email/candidates"
+import { displayCompanyName } from "@/lib/company-name"
 
 interface Props {
   locale: Locale
@@ -38,9 +39,15 @@ const mixed = known && isMixedEvidence(top.confidence)
 const related = known ? store.domainsUsingPattern(top.patternId, 12, domain) : []
 const path = `/${domain}`
 
-const title = known ? fill(t.domain.metaTitle, { domain, example }) : fill(t.domain.metaTitleUnknown, { domain })
+const format = `${plainTemplate(topTemplate, t.titleTokens)}@${domain}`
+const shownName = displayCompanyName(record?.companyName, domain)
+const name = shownName ? `${shownName} (${domain})` : domain
+const count = formatNumber(locale, record?.sampleCount ?? 0)
+const title = known
+  ? fill(mixed ? t.domain.metaTitleMixed : t.domain.metaTitle, { domain, format, share })
+  : fill(t.domain.metaTitleUnknown, { domain })
 const description = known
-  ? fill(mixed ? t.domain.metaDescriptionMixed : t.domain.metaDescription, { domain, company, template: templateText, share })
+  ? fill(mixed ? t.domain.metaDescriptionMixed : t.domain.metaDescription, { name, format, share, count, example })
   : fill(t.domain.metaDescriptionUnknown, { domain })
 
 const faq = [

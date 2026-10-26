@@ -4,7 +4,7 @@ import { normalizeDomain } from "../src/lib/email/domains"
 import { inferDomainPatterns, matchPatterns } from "../src/lib/email/infer"
 import { mailHostName } from "../src/lib/email/mail-host"
 import { parseName } from "../src/lib/email/names"
-import { PATTERNS, applyTemplate, renameTokens, spreadsheetFormula, templateSegments } from "../src/lib/email/patterns"
+import { PATTERNS, applyTemplate, plainTemplate, renameTokens, spreadsheetFormula, templateSegments } from "../src/lib/email/patterns"
 
 describe("parseName", () => {
   it.each([
@@ -166,5 +166,13 @@ describe("isMixedEvidence", () => {
     expect(isMixedEvidence(0.29)).toBe(true)
     expect(isMixedEvidence(0.5)).toBe(false)
     expect(isMixedEvidence(0.91)).toBe(false)
+  })
+})
+
+describe("plainTemplate", () => {
+  it("writes a format the way people search for it", () => {
+    const words = { first: "firstname", last: "lastname", f: "f", l: "l" }
+    expect(plainTemplate("{first}.{last}", words)).toBe("firstname.lastname")
+    expect(plainTemplate("{f}{last}", words)).toBe("flastname")
   })
 })

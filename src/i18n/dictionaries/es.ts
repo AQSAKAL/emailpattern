@@ -102,10 +102,11 @@ export const es: Dictionary = {
   },
 
   domain: {
-    metaTitle: "Formato de correo de {domain}: {example}",
+    metaTitle: "Formato de correo de {domain}: {format} ({share})",
+    metaTitleMixed: "Formatos de correo de {domain}: {format} ({share}) y otros",
     metaTitleUnknown: "Formato de correo de {domain}",
-    metaDescription: "En {company} el formato de correo es {template} ({share}). Encuentra la dirección de cualquiera en {domain}.",
-    metaDescriptionMixed: "{company} usa más de un formato de correo; el más común es {template} ({share}). Encuentra la dirección de cualquiera en {domain}.",
+    metaDescription: "Formato de correo de {name}: {format}, usado por el {share} de las {count} personas encontradas, p. ej. {example}. Busca a cualquiera gratis, sin registro.",
+    metaDescriptionMixed: "{name} usa más de un formato de correo. El más común es {format} ({share} de {count} personas), p. ej. {example}. Busca a cualquiera gratis.",
     metaDescriptionUnknown: "Encuentra el formato de correo y la dirección de cualquiera en {domain}.",
     title: "Formato de correo de {domain}",
     leadKnown: "En {company} usan {template}. Para {person}, eso es {example}.",
@@ -174,6 +175,7 @@ export const es: Dictionary = {
   },
 
   tokens: { first: "nombre", last: "apellido", f: "n", l: "a" },
+  titleTokens: { first: "nombre", last: "apellido", f: "n", l: "a" },
 
   browse: {
     metaTitle: "Formatos de correo de empresas: {letter}",

@@ -84,3 +84,8 @@ export function spreadsheetFormula(template: string): string {
 export function renameTokens(template: string, labels: Record<Token, string>): string {
   return template.replace(/\{(first|last|f|l)\}/g, (_, token: Token) => `{${labels[token]}}`)
 }
+
+/** The template as people write it in search results: "{first}.{last}" → "firstname.lastname". */
+export function plainTemplate(template: string, words: Record<Token, string>): string {
+  return template.replace(/\{(first|last|f|l)\}/g, (_, token: Token) => words[token])
+}

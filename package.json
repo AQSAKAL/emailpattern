@@ -15,7 +15,8 @@
     "check": "astro check && tsc --noEmit",
     "import": "tsx scripts/import.ts",
     "astro": "astro",
-    "import-mx": "tsx scripts/import-mx.ts"
+    "import-mx": "tsx scripts/import-mx.ts",
+    "drop-mail-providers": "tsx scripts/drop-mail-providers.ts"
   },
   "dependencies": {
     "@astrojs/node": "^11.1.9",
@@ -28,6 +29,7 @@
     "astro": "^7.4.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "free-email-domains": "^1.15.15",
     "lucide-react": "^1.61.0",
     "maxmind": "5.0.7",
     "radix-ui": "^1.8.1",
