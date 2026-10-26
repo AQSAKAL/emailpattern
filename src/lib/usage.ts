@@ -164,7 +164,11 @@ export interface RequestEvent extends RequestExtra, Geo {
   referrer_host: string | null
   /** The referring page without its query string or fragment. */
   referrer: string | null
+  /** "probe": asked for a secret or admin path and got the IP banned; "banned": refused while banned. */
+  blocked: Blocked | null
 }
+
+export type Blocked = "probe" | "banned"
 
 export interface RequestInput {
   now: Date
@@ -179,6 +183,7 @@ export interface RequestInput {
   host?: string | null
   acceptLanguage?: string | null
   geo?: Geo
+  blocked?: Blocked | null
   secret: string
   extra?: RequestExtra
 }
@@ -219,6 +224,7 @@ export function buildRequestEvent(input: RequestInput): RequestEvent {
     accept_language: text(input.acceptLanguage),
     referrer_host: referer ? referer.host.slice(0, 100) : null,
     referrer: referer ? `${referer.origin}${referer.pathname}`.slice(0, 300) : null,
+    blocked: input.blocked ?? null,
     ...(input.extra ?? NO_EXTRA),
   }
 }

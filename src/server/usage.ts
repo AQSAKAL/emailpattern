@@ -1,7 +1,7 @@
 import { randomBytes } from "node:crypto"
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { resolve } from "node:path"
-import { buildLookupEvent, buildRequestEvent, type RequestEvent } from "../lib/usage"
+import { buildLookupEvent, buildRequestEvent, type Blocked, type RequestEvent } from "../lib/usage"
 import { lookupGeo } from "./geo"
 import { currentRequest, type RequestContext } from "./request-context"
 import { createUsageLog, type UsageLog } from "./usage-log"
@@ -56,6 +56,7 @@ export interface RecordedRequest {
   referer: string | null
   host: string | null
   acceptLanguage: string | null
+  blocked: Blocked | null
 }
 
 export function logRequest(recorded: RecordedRequest): void {
