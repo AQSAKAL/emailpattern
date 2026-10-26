@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import { LOCALE_CODES, dictionary, fill, localePath, splitPlaceholders, unlocalizedPath } from "../src/i18n"
-import { formatShare } from "../src/i18n/format"
+import { countryName, formatMoney, formatShare } from "../src/i18n/format"
 import { PATTERNS } from "../src/lib/email/patterns"
 
 function shape(value: unknown): unknown {
@@ -58,5 +58,18 @@ describe("formatShare", () => {
     expect(formatShare("en", 0.001)).toBe("<1%")
     expect(formatShare("en", 0)).toBe("0%")
     expect(formatShare("en", 0.42)).toBe("42%")
+  })
+})
+
+describe("formatMoney and countryName", () => {
+  it("formats revenue short, in its own currency", () => {
+    expect(formatMoney("en", 1_200_000_000, "SEK")).toMatch(/^SEK\s1\.2B$/)
+    expect(formatMoney("en", null, "SEK")).toBeNull()
+    expect(formatMoney("en", 5, "NOPE1")).toBeNull()
+  })
+
+  it("names countries in the page's language", () => {
+    expect(countryName("en", "se")).toBe("Sweden")
+    expect(countryName("de", "SE")).toBe("Schweden")
   })
 })

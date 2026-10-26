@@ -16,7 +16,8 @@
     "import": "tsx scripts/import.ts",
     "astro": "astro",
     "import-mx": "tsx scripts/import-mx.ts",
-    "drop-mail-providers": "tsx scripts/drop-mail-providers.ts"
+    "drop-mail-providers": "tsx scripts/drop-mail-providers.ts",
+    "import-companies": "tsx scripts/import-companies.ts"
   },
   "dependencies": {
     "@astrojs/node": "^11.1.9",

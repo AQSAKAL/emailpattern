@@ -7,7 +7,6 @@ import { URLS_PER_SITEMAP, urlSet } from "@/server/sitemap"
 
 export const prerender = false
 
-const BROWSE = [..."abcdefghijklmnopqrstuvwxyz0123456789"].map((c) => `/browse/${c}`)
 
 /** /sitemaps/de-pages.xml and /sitemaps/de-domains-3.xml */
 export const GET: APIRoute = async ({ params, site }) => {
@@ -17,7 +16,8 @@ export const GET: APIRoute = async ({ params, site }) => {
   const origin = site!.origin
 
   if (match[2] === "pages") {
-    const paths = ["/", "/patterns", ...PATTERNS.map((p) => `/patterns/${p.id}`), ...BROWSE]
+    // Browse pages are noindex (they answer no search), so they stay out of the sitemap.
+    const paths = ["/", "/patterns", ...PATTERNS.map((p) => `/patterns/${p.id}`)]
     return xml(urlSet(origin, locale, paths), "public, max-age=86400")
   }
 

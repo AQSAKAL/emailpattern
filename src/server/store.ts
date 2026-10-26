@@ -20,6 +20,22 @@ export interface MailHost {
   host: string | null
 }
 
+/** A registered company that uses the domain as its website. rank 1 is the main one. */
+export interface CompanyFact {
+  domain: string
+  rank: number
+  name: string
+  country: string
+  foundedYear: number | null
+  industry: string | null
+  legalForm: string | null
+  employees: number | null
+  employeesExact: boolean
+  revenue: number | null
+  currency: string | null
+  financialYear: number | null
+}
+
 export interface DomainListing {
   domain: string
   companyName: string | null
@@ -42,6 +58,22 @@ const SCHEMA = `
     weight REAL NOT NULL,
     PRIMARY KEY (domain, pattern_id)
   ) WITHOUT ROWID;
+  CREATE TABLE IF NOT EXISTS domain_companies (
+    domain TEXT NOT NULL,
+    rank INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    country TEXT NOT NULL,
+    founded_year INTEGER,
+    industry TEXT,
+    legal_form TEXT,
+    employees INTEGER,
+    employees_exact INTEGER NOT NULL DEFAULT 0,
+    revenue REAL,
+    currency TEXT,
+    financial_year INTEGER,
+    PRIMARY KEY (domain, rank)
+  ) WITHOUT ROWID;
+  CREATE INDEX IF NOT EXISTS domain_companies_by_industry ON domain_companies (industry, country, rank);
   CREATE TABLE IF NOT EXISTS mail_hosts (
     domain TEXT PRIMARY KEY,
     accepts_mail INTEGER,
@@ -51,6 +83,24 @@ const SCHEMA = `
 `
 
 type Row = Record<string, unknown>
+
+function toCompany(row: Row): CompanyFact {
+  const num = (v: unknown) => (v === null || v === undefined ? null : Number(v))
+  return {
+    domain: row.domain as string,
+    rank: Number(row.rank),
+    name: row.name as string,
+    country: row.country as string,
+    foundedYear: num(row.founded_year),
+    industry: (row.industry as string | null) || null,
+    legalForm: (row.legal_form as string | null) || null,
+    employees: num(row.employees),
+    employeesExact: Boolean(row.employees_exact),
+    revenue: num(row.revenue),
+    currency: (row.currency as string | null) || null,
+    financialYear: num(row.financial_year),
+  }
+}
 
 function toListing(row: Row): DomainListing {
   return {
@@ -182,6 +232,47 @@ export function openStore(path: string) {
         throw error
       }
       return removed
+    },
+
+    /** The registered companies using a domain as their website, main one first. */
+    getCompanies(domain: string): CompanyFact[] {
+      return (db.prepare("SELECT * FROM domain_companies WHERE domain = ? ORDER BY rank").all(domain) as Row[]).map(toCompany)
+    },
+
+    /** Indexed domains whose main company shares an industry and country, biggest first. */
+    similarDomains(industry: string, country: string, exclude: string, minSamples: number, limit: number): DomainListing[] {
+      const rows = db
+        .prepare(
+          `SELECT d.domain, d.company_name, d.primary_pattern, d.sample_count FROM domain_companies c
+           JOIN domains d ON d.domain = c.domain
+           WHERE c.industry = ? AND c.country = ? AND c.rank = 1 AND c.domain != ? AND d.sample_count >= ?
+           ORDER BY ifnull(c.employees, 0) DESC, d.sample_count DESC LIMIT ?`,
+        )
+        .all(industry, country, exclude, minSamples, limit) as Row[]
+      return rows.map(toListing)
+    },
+
+    /** Replaces all company facts at once (one-time loads from registry data). */
+    replaceCompanies(rows: Iterable<CompanyFact>): number {
+      const insert = db.prepare(
+        `INSERT INTO domain_companies (domain, rank, name, country, founded_year, industry, legal_form, employees,
+           employees_exact, revenue, currency, financial_year) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      )
+      let count = 0
+      db.exec("BEGIN")
+      try {
+        db.exec("DELETE FROM domain_companies")
+        for (const c of rows) {
+          insert.run(c.domain, c.rank, c.name, c.country, c.foundedYear, c.industry, c.legalForm, c.employees,
+            c.employeesExact ? 1 : 0, c.revenue, c.currency, c.financialYear)
+          count++
+        }
+        db.exec("COMMIT")
+      } catch (error) {
+        db.exec("ROLLBACK")
+        throw error
+      }
+      return count
     },
 
     getMailHost(domain: string): MailHost | null {

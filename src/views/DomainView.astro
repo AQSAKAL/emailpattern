@@ -14,6 +14,7 @@ import { INDEXABLE_MIN_SAMPLES, getStore } from "@/server/db"
 import { domainContext } from "@/server/find"
 import { rankCandidates, isMixedEvidence } from "@/lib/email/candidates"
 import { displayCompanyName } from "@/lib/company-name"
+import { countryName, formatMoney } from "@/i18n/format"
 
 interface Props {
   locale: Locale
@@ -39,8 +40,27 @@ const mixed = known && isMixedEvidence(top.confidence)
 const related = known ? store.domainsUsingPattern(top.patternId, 12, domain) : []
 const path = `/${domain}`
 
+const lang = LOCALES[locale].htmlLang
+const companies = store.getCompanies(domain)
+const main = companies[0] ?? null
+const group = companies.slice(1)
+const mainCountry = main ? countryName(lang, main.country) : null
+const revenue = main ? formatMoney(lang, main.revenue, main.currency) : null
+const facts = main
+  ? ([
+      [t.domain.factName, main.name],
+      [t.domain.factCountry, mainCountry],
+      [t.domain.factIndustry, main.industry],
+      [t.domain.factFounded, main.foundedYear ? String(main.foundedYear) : null],
+      [t.domain.factEmployees, main.employees ? formatNumber(locale, main.employees) : null],
+      [t.domain.factRevenue, revenue && main.financialYear ? fill(t.domain.revenueYear, { amount: revenue, year: main.financialYear }) : revenue],
+      [t.domain.factLegalForm, main.legalForm],
+    ].filter(([, value]) => value) as [string, string][])
+  : []
+const similar = main?.industry ? store.similarDomains(main.industry, main.country, domain, INDEXABLE_MIN_SAMPLES, 12) : []
+
 const format = `${plainTemplate(topTemplate, t.titleTokens)}@${domain}`
-const shownName = displayCompanyName(record?.companyName, domain)
+const shownName = displayCompanyName(record?.companyName ?? main?.name, domain)
 const name = shownName ? `${shownName} (${domain})` : domain
 const count = formatNumber(locale, record?.sampleCount ?? 0)
 const title = known
@@ -50,7 +70,18 @@ const description = known
   ? fill(mixed ? t.domain.metaDescriptionMixed : t.domain.metaDescription, { name, format, share, count, example })
   : fill(t.domain.metaDescriptionUnknown, { domain })
 
+const companyAnswer = main
+  ? [
+      fill(t.domain.faqCompanyA, { domain, name: main.name, country: mainCountry! }),
+      main.industry ? fill(t.domain.faqCompanyIndustry, { industry: main.industry }) : "",
+      main.foundedYear ? fill(t.domain.faqCompanyFounded, { year: main.foundedYear }) : "",
+      main.employees ? fill(t.domain.faqCompanyEmployees, { employees: formatNumber(locale, main.employees) }) : "",
+      companies.length > 1 ? fill(t.domain.faqCompanyGroup, { count: companies.length }) : "",
+    ].filter(Boolean).join(" ")
+  : null
+
 const faq = [
+  ...(companyAnswer ? [{ q: fill(t.domain.faqCompanyQ, { domain }), a: companyAnswer }] : []),
   ...(known
     ? [{ q: fill(t.domain.faqFormatQ, { domain }), a: fill(mixed ? t.domain.faqFormatAMixed : t.domain.faqFormatA, { company, example, template: templateText, share }) }]
     : []),
@@ -65,7 +96,21 @@ const faq = [
       }]),
 ]
 
+const organization = main
+  ? [{
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: main.name,
+      url: `https://${domain}`,
+      ...(main.foundedYear ? { foundingDate: String(main.foundedYear) } : {}),
+      ...(main.employees ? { numberOfEmployees: { "@type": "QuantitativeValue", value: main.employees } } : {}),
+      ...(main.industry ? { knowsAbout: main.industry } : {}),
+      address: { "@type": "PostalAddress", addressCountry: main.country },
+    }]
+  : []
+
 const jsonLd = [
+  ...organization,
   {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -153,6 +198,30 @@ const jsonLd = [
       )}
     </section>
 
+    {main && (
+      <section class="flex flex-col gap-8">
+        <SectionHeading title={fill(t.domain.companyTitle, { company: displayCompanyName(main.name, domain) ?? main.name })} />
+        <dl class="grid gap-x-12 sm:grid-cols-2">
+          {facts.map(([label, value]) => (
+            <div class="flex items-baseline justify-between gap-6 border-t border-border py-3">
+              <dt class="text-sm text-muted-foreground">{label}</dt>
+              <dd class="text-right text-sm font-medium">{value}</dd>
+            </div>
+          ))}
+        </dl>
+        {group.length > 0 && (
+          <div class="flex flex-col gap-3">
+            <p class="eyebrow text-muted-foreground">{fill(t.domain.groupTitle, { domain })}</p>
+            <ul class="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+              {group.map((c) => (
+                <li>{c.name} <span class="text-muted-foreground">· {countryName(lang, c.country)}</span></li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </section>
+    )}
+
     <section class="flex flex-col gap-8">
       <SectionHeading title={fill(t.domain.findTitle, { domain })} />
       <Finder
@@ -175,6 +244,17 @@ const jsonLd = [
         ))}
       </dl>
     </section>
+
+    {similar.length > 0 && main?.industry && (
+      <section class="flex flex-col gap-6">
+        <SectionHeading title={fill(t.domain.similarTitle, { industry: main.industry, country: mainCountry! })} />
+        <div class="flex flex-wrap gap-1">
+          {similar.map((r) => (
+            <LinkButton variant="outline" size="sm" href={localePath(locale, `/${r.domain}`)}>{r.companyName ? `${r.companyName} · ${r.domain}` : r.domain}</LinkButton>
+          ))}
+        </div>
+      </section>
+    )}
 
     {related.length > 0 && (
       <section class="flex flex-col gap-6">
