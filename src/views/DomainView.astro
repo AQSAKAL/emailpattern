@@ -13,7 +13,7 @@ import { applyTemplate, patternById, renameTokens, plainTemplate } from "@/lib/e
 import { INDEXABLE_MIN_SAMPLES, getStore } from "@/server/db"
 import { domainContext } from "@/server/find"
 import { rankCandidates, isMixedEvidence } from "@/lib/email/candidates"
-import { displayCompanyName } from "@/lib/company-name"
+import { displayCompanyName, splitIndustry } from "@/lib/company-name"
 import { countryName, formatMoney } from "@/i18n/format"
 
 interface Props {
@@ -46,19 +46,20 @@ const main = companies[0] ?? null
 const group = companies.slice(1)
 const MAX_COMPANIES = 6
 const mainCountry = main ? countryName(lang, main.country) : null
+const industry = splitIndustry(main?.industry)
 const revenue = main ? formatMoney(lang, main.revenue, main.currency) : null
 const facts = main
   ? ([
       [t.domain.factName, main.name],
       [t.domain.factCountry, mainCountry],
-      [t.domain.factIndustry, main.industry],
+      [t.domain.factIndustry, industry.label],
       [t.domain.factFounded, main.foundedYear ? String(main.foundedYear) : null],
       [t.domain.factEmployees, main.employees ? formatNumber(locale, main.employees) : null],
       [t.domain.factRevenue, revenue && main.financialYear ? fill(t.domain.revenueYear, { amount: revenue, year: main.financialYear }) : revenue],
       [t.domain.factLegalForm, main.legalForm],
     ].filter(([, value]) => value) as [string, string][])
   : []
-const similar = main?.industry ? store.similarDomains(main.industry, main.country, domain, INDEXABLE_MIN_SAMPLES, 12) : []
+const similar = industry.label ? store.similarDomains(main!.industry!, main!.country, domain, INDEXABLE_MIN_SAMPLES, 12) : []
 
 const format = `${plainTemplate(topTemplate, t.titleTokens)}@${domain}`
 const shownName = displayCompanyName(record?.companyName ?? main?.name, domain)
@@ -74,7 +75,7 @@ const description = known
 const companyAnswer = main
   ? [
       fill(t.domain.faqCompanyA, { domain, name: main.name, country: mainCountry! }),
-      main.industry ? fill(t.domain.faqCompanyIndustry, { industry: main.industry }) : "",
+      industry.label ? fill(t.domain.faqCompanyIndustry, { industry: industry.label }) : "",
       main.foundedYear ? fill(t.domain.faqCompanyFounded, { year: main.foundedYear }) : "",
       main.employees ? fill(t.domain.faqCompanyEmployees, { employees: formatNumber(locale, main.employees) }) : "",
       // The load keeps at most MAX_COMPANIES per domain, so a full list may stand for more.
@@ -106,7 +107,8 @@ const organization = main
       url: `https://${domain}`,
       ...(main.foundedYear ? { foundingDate: String(main.foundedYear) } : {}),
       ...(main.employees ? { numberOfEmployees: { "@type": "QuantitativeValue", value: main.employees } } : {}),
-      ...(main.industry ? { knowsAbout: main.industry } : {}),
+      ...(industry.label ? { knowsAbout: industry.label } : {}),
+      ...(industry.description ? { description: industry.description } : {}),
       address: { "@type": "PostalAddress", addressCountry: main.country },
     }]
   : []
@@ -203,6 +205,7 @@ const jsonLd = [
     {main && (
       <section class="flex flex-col gap-8">
         <SectionHeading title={fill(t.domain.companyTitle, { company: displayCompanyName(main.name, domain) ?? main.name })} />
+        {industry.description && <p class="max-w-3xl leading-relaxed text-muted-foreground">{industry.description}</p>}
         <dl class="grid gap-x-12 sm:grid-cols-2">
           {facts.map(([label, value]) => (
             <div class="flex items-baseline justify-between gap-6 border-t border-border py-3">
@@ -247,9 +250,9 @@ const jsonLd = [
       </dl>
     </section>
 
-    {similar.length > 0 && main?.industry && (
+    {similar.length > 0 && industry.label && (
       <section class="flex flex-col gap-6">
-        <SectionHeading title={fill(t.domain.similarTitle, { industry: main.industry, country: mainCountry! })} />
+        <SectionHeading title={fill(t.domain.similarTitle, { industry: industry.label, country: mainCountry! })} />
         <div class="flex flex-wrap gap-1">
           {similar.map((r) => (
             <LinkButton variant="outline" size="sm" href={localePath(locale, `/${r.domain}`)}>{r.companyName ? `${r.companyName} · ${r.domain}` : r.domain}</LinkButton>
