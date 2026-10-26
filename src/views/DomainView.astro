@@ -44,6 +44,7 @@ const lang = LOCALES[locale].htmlLang
 const companies = store.getCompanies(domain)
 const main = companies[0] ?? null
 const group = companies.slice(1)
+const MAX_COMPANIES = 6
 const mainCountry = main ? countryName(lang, main.country) : null
 const revenue = main ? formatMoney(lang, main.revenue, main.currency) : null
 const facts = main
@@ -76,7 +77,8 @@ const companyAnswer = main
       main.industry ? fill(t.domain.faqCompanyIndustry, { industry: main.industry }) : "",
       main.foundedYear ? fill(t.domain.faqCompanyFounded, { year: main.foundedYear }) : "",
       main.employees ? fill(t.domain.faqCompanyEmployees, { employees: formatNumber(locale, main.employees) }) : "",
-      companies.length > 1 ? fill(t.domain.faqCompanyGroup, { count: companies.length }) : "",
+      // The load keeps at most MAX_COMPANIES per domain, so a full list may stand for more.
+      companies.length > 1 ? fill(t.domain.faqCompanyGroup, { count: companies.length >= MAX_COMPANIES ? `${companies.length}+` : companies.length }) : "",
     ].filter(Boolean).join(" ")
   : null
 
