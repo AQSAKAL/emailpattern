@@ -40,3 +40,24 @@ describe("patternMix", () => {
     s.close()
   })
 })
+
+describe("indexable domains", () => {
+  it("leaves out domains known not to take mail, but keeps unchecked ones", () => {
+    const s = store()
+    for (const domain of ["mail.com", "nomail.com", "unchecked.com", "thin.com"]) {
+      s.upsertDomain({ domain, companyName: null, sampleCount: domain === "thin.com" ? 1 : 5, patterns: [{ patternId: "first", weight: 5 }], updatedAt: at })
+    }
+    s.upsertMailHosts(
+      [
+        { domain: "mail.com", acceptsMail: true, host: "Google Workspace" },
+        { domain: "nomail.com", acceptsMail: false, host: null },
+      ],
+      at,
+    )
+    expect(s.domainPage(0, 10, 3)).toEqual(["mail.com", "unchecked.com"])
+    expect(s.countIndexable(3)).toBe(2)
+    expect(s.listDomains({ minSamples: 3 }).map((d) => d.domain)).toEqual(["mail.com", "unchecked.com"])
+    expect(s.countDomains()).toBe(4)
+    s.close()
+  })
+})

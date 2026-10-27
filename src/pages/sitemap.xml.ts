@@ -7,7 +7,7 @@ import { URLS_PER_SITEMAP, sitemapIndex } from "@/server/sitemap"
 export const prerender = false
 
 export const GET: APIRoute = async ({ site }) => {
-  const count = (await getStore()).countDomains(INDEXABLE_MIN_SAMPLES)
+  const count = (await getStore()).countIndexable(INDEXABLE_MIN_SAMPLES)
   const chunks = Math.ceil(count / URLS_PER_SITEMAP)
   const files = LOCALE_CODES.flatMap((locale) => [
     `/sitemaps/${locale}-pages.xml`,

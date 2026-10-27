@@ -136,7 +136,7 @@ const jsonLd = [
   title={title}
   description={description}
   path={path}
-  noindex={!record || record.sampleCount < INDEXABLE_MIN_SAMPLES}
+  noindex={!record || record.sampleCount < INDEXABLE_MIN_SAMPLES || mail.acceptsMail === false}
   jsonLd={jsonLd}
 >
   <div class="px-2 sm:px-4">

@@ -84,6 +84,9 @@ const SCHEMA = `
 
 type Row = Record<string, unknown>
 
+/** SQL condition on `domains d`: a domain known not to take mail never gets an indexed page. */
+const TAKES_MAIL = "NOT EXISTS (SELECT 1 FROM mail_hosts m WHERE m.domain = d.domain AND m.accepts_mail = 0)"
+
 function toCompany(row: Row): CompanyFact {
   const num = (v: unknown) => (v === null || v === undefined ? null : Number(v))
   return {
@@ -158,8 +161,8 @@ export function openStore(path: string) {
     listDomains({ prefix = "", after = "", limit = 200, minSamples = 0 }: { prefix?: string; after?: string; limit?: number; minSamples?: number }): DomainListing[] {
       const rows = db
         .prepare(
-          `SELECT domain, company_name, primary_pattern, sample_count FROM domains
-           WHERE domain > ? AND domain LIKE ? ESCAPE '\\' AND sample_count >= ?
+          `SELECT domain, company_name, primary_pattern, sample_count FROM domains d
+           WHERE domain > ? AND domain LIKE ? ESCAPE '\\' AND sample_count >= ? AND ${TAKES_MAIL}
            ORDER BY domain LIMIT ?`,
         )
         .all(after, `${prefix.replace(/[\\%_]/g, "\\$&")}%`, minSamples, limit) as Row[]
@@ -169,9 +172,15 @@ export function openStore(path: string) {
     /** One sitemap-sized slice of indexable domains. */
     domainPage(offset: number, limit: number, minSamples: number): string[] {
       const rows = db
-        .prepare("SELECT domain FROM domains WHERE sample_count >= ? ORDER BY domain LIMIT ? OFFSET ?")
+        .prepare(`SELECT domain FROM domains d WHERE sample_count >= ? AND ${TAKES_MAIL} ORDER BY domain LIMIT ? OFFSET ?`)
         .all(minSamples, limit, offset) as Row[]
       return rows.map((r) => r.domain as string)
+    },
+
+    /** How many domains have an indexed page. */
+    countIndexable(minSamples: number): number {
+      const row = db.prepare(`SELECT count(*) AS n FROM domains d WHERE sample_count >= ? AND ${TAKES_MAIL}`).get(minSamples) as Row
+      return Number(row.n)
     },
 
     countDomains(minSamples = 0): number {
@@ -245,7 +254,7 @@ export function openStore(path: string) {
         .prepare(
           `SELECT d.domain, d.company_name, d.primary_pattern, d.sample_count FROM domain_companies c
            JOIN domains d ON d.domain = c.domain
-           WHERE c.industry = ? AND c.country = ? AND c.rank = 1 AND c.domain != ? AND d.sample_count >= ?
+           WHERE c.industry = ? AND c.country = ? AND c.rank = 1 AND c.domain != ? AND d.sample_count >= ? AND ${TAKES_MAIL}
            ORDER BY ifnull(c.employees, 0) DESC, d.sample_count DESC LIMIT ?`,
         )
         .all(industry, country, exclude, minSamples, limit) as Row[]
