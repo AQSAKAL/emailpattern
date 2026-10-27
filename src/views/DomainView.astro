@@ -73,7 +73,7 @@ const description = known
   ? fill(mixed ? t.domain.metaDescriptionMixed : t.domain.metaDescription, { name, format, share, count, example })
   : byHost
     ? fill(t.domain.metaDescriptionHost, { name, format, host: mail.host! })
-    : fill(t.domain.metaDescriptionUnknown, { name })
+    : fill(t.domain.metaDescriptionUnknown, { name, format })
 // A page with no address evidence is indexed only once released, and then in English only.
 const released = !known && locale === DEFAULT_LOCALE && store.isReleased(domain)
 const indexed = mail.acceptsMail !== false && (known ? record!.sampleCount >= INDEXABLE_MIN_SAMPLES : released)

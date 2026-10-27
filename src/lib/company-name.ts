@@ -29,10 +29,14 @@ function compact(text: string): string {
   return text.normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "")
 }
 
-/** "NOVO NORDISK" reads "Novo Nordisk"; short all-caps words (IKEA, NHS) stay as acronyms. */
+/**
+ * "NOVO NORDISK" reads "Novo Nordisk". Acronyms stay: words of three letters or fewer (NHS, DSV),
+ * and a one-word name of four (IKEA, SAAB).
+ */
 function recase(name: string): string {
   if (name !== name.toUpperCase() || name === name.toLowerCase()) return name
-  return name.replace(/\p{L}+/gu, (word) => (word.length > 4 ? word[0] + word.slice(1).toLowerCase() : word))
+  const keep = /\s/.test(name.trim()) ? 3 : 4
+  return name.replace(/\p{L}+/gu, (word) => (word.length > keep ? word[0] + word.slice(1).toLowerCase() : word))
 }
 
 /**

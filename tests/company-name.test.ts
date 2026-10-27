@@ -23,6 +23,8 @@ describe("searchName", () => {
     expect(searchName("lambda9 GmbH", "lambda9.de")).toBe("lambda9")
     expect(searchName('Sabiedrība ar ierobežotu atbildību "ASILEKS"', "asileks.com")).toBe("Asileks")
     expect(searchName("IKEA", "ikea.com")).toBe("IKEA")
+    expect(searchName("NOVO NORDISK A/S", "novonordisk.com")).toBe("Novo Nordisk")
+    expect(searchName("APOTEK 1 GRUPPEN AS", "apotek1.no")).toBe("Apotek 1 Gruppen")
   })
 
   it("leaves out registry names that are another company's", () => {
