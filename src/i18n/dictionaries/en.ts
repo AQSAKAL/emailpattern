@@ -109,6 +109,7 @@ export const en = {
     metaDescription: "{name} email format: {format}, used by {share} of the {count} people we found, e.g. {example}. Look up anyone there for free, no sign-up.",
     metaDescriptionMixed: "{name} uses more than one email format. The most common is {format} ({share} of {count} people), e.g. {example}. Look up anyone there for free.",
     metaDescriptionUnknown: "Find the email format and anyone's address at {name}.",
+    metaDescriptionHost: "{name} email format: most likely {format}, the most common format at companies whose mail runs on {host}. Look up anyone there for free, no sign-up.",
     title: "{name} email format",
     leadKnown: "People at {company} use {template}. For {person}, that is {example}.",
     leadMixed: "People at {company} use more than one format. The most common is {template}, used by {share} of the people we have seen; for {person}, that gives {example}.",

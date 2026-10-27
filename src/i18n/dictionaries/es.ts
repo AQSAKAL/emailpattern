@@ -108,6 +108,7 @@ export const es: Dictionary = {
     metaDescription: "Formato de correo de {name}: {format}, usado por el {share} de las {count} personas encontradas, p. ej. {example}. Busca a cualquiera gratis, sin registro.",
     metaDescriptionMixed: "{name} usa más de un formato de correo. El más común es {format} ({share} de {count} personas), p. ej. {example}. Busca a cualquiera gratis.",
     metaDescriptionUnknown: "Encuentra el formato de correo y la dirección de cualquiera en {name}.",
+    metaDescriptionHost: "Formato de correo de {name}: probablemente {format}, el formato más común en empresas cuyo correo va por {host}. Encuentra a cualquiera gratis, sin registro.",
     title: "Formato de correo de {name}",
     leadKnown: "En {company} usan {template}. Para {person}, eso es {example}.",
     leadMixed: "En {company} se usa más de un formato. El más común es {template}, que usa el {share} de las personas que hemos visto; para {person}, eso da {example}.",

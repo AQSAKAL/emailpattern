@@ -12,10 +12,12 @@ interface Props {
   path: string
   /** Thin pages (domains we know little about) stay out of the index. */
   noindex?: boolean
+  /** False when only this language's page is indexed: no hreflang alternates then. */
+  languages?: boolean
   jsonLd?: object[]
 }
 
-const { locale, title, description, path, noindex = false, jsonLd = [] } = Astro.props
+const { locale, title, description, path, noindex = false, languages = true, jsonLd = [] } = Astro.props
 const site = Astro.site!
 const canonical = new URL(localePath(locale, path), site).href
 const alternates = LOCALE_CODES.map((code) => ({ code, href: new URL(localePath(code, path), site).href }))
@@ -30,8 +32,8 @@ const alternates = LOCALE_CODES.map((code) => ({ code, href: new URL(localePath(
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex, follow" />}
-    {!noindex && alternates.map((a) => <link rel="alternate" hreflang={LOCALES[a.code].htmlLang} href={a.href} />)}
-    {!noindex && <link rel="alternate" hreflang="x-default" href={new URL(localePath(DEFAULT_LOCALE, path), site).href} />}
+    {!noindex && languages && alternates.map((a) => <link rel="alternate" hreflang={LOCALES[a.code].htmlLang} href={a.href} />)}
+    {!noindex && languages && <link rel="alternate" hreflang="x-default" href={new URL(localePath(DEFAULT_LOCALE, path), site).href} />}
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="EmailPattern" />
     <meta property="og:title" content={title} />

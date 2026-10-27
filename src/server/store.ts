@@ -36,6 +36,13 @@ export interface CompanyFact {
   financialYear: number | null
 }
 
+/** A domain that could be released to the index: no address evidence, takes mail, has a registered company. */
+export interface ReleaseCandidate {
+  domain: string
+  name: string
+  employees: number | null
+}
+
 export interface DomainListing {
   domain: string
   companyName: string | null
@@ -79,6 +86,11 @@ const SCHEMA = `
     accepts_mail INTEGER,
     host TEXT,
     checked_at TEXT NOT NULL
+  ) WITHOUT ROWID;
+  -- Domains with no address evidence let into the index, a batch at a time (English pages only).
+  CREATE TABLE IF NOT EXISTS released_pages (
+    domain TEXT PRIMARY KEY,
+    batch INTEGER NOT NULL
   ) WITHOUT ROWID;
 `
 
@@ -262,7 +274,7 @@ export function openStore(path: string) {
     },
 
     /** Replaces all company facts at once (one-time loads from registry data). */
-    replaceCompanies(rows: Iterable<CompanyFact>): number {
+    async replaceCompanies(rows: Iterable<CompanyFact> | AsyncIterable<CompanyFact>): Promise<number> {
       const insert = db.prepare(
         `INSERT INTO domain_companies (domain, rank, name, country, founded_year, industry, legal_form, employees,
            employees_exact, revenue, currency, financial_year) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -271,7 +283,7 @@ export function openStore(path: string) {
       db.exec("BEGIN")
       try {
         db.exec("DELETE FROM domain_companies")
-        for (const c of rows) {
+        for await (const c of rows) {
           insert.run(c.domain, c.rank, c.name, c.country, c.foundedYear, c.industry, c.legalForm, c.employees,
             c.employeesExact ? 1 : 0, c.revenue, c.currency, c.financialYear)
           count++
@@ -346,6 +358,55 @@ export function openStore(path: string) {
       )
       const total = [...domainsByHost.values()].reduce((a, b) => a + b, 0)
       return { overall: { shares: overall, domains: total }, byHost }
+    },
+
+    isReleased(domain: string): boolean {
+      return db.prepare("SELECT 1 FROM released_pages WHERE domain = ?").get(domain) !== undefined
+    },
+
+    /** One sitemap-sized slice of released domains that still take mail. */
+    releasedPage(offset: number, limit: number): string[] {
+      const rows = db
+        .prepare(`SELECT domain FROM released_pages d WHERE ${TAKES_MAIL} ORDER BY domain LIMIT ? OFFSET ?`)
+        .all(limit, offset) as Row[]
+      return rows.map((r) => r.domain as string)
+    },
+
+    countReleased(): number {
+      return Number((db.prepare(`SELECT count(*) AS n FROM released_pages d WHERE ${TAKES_MAIL}`).get() as Row).n)
+    },
+
+    /**
+     * Domains not yet released that take mail, have a registered company and no address evidence,
+     * biggest companies first.
+     */
+    *releaseCandidates(): Generator<ReleaseCandidate> {
+      const rows = db
+        .prepare(
+          `SELECT c.domain, c.name, c.employees FROM domain_companies c
+           JOIN mail_hosts m ON m.domain = c.domain AND m.accepts_mail = 1
+           WHERE c.rank = 1
+             AND NOT EXISTS (SELECT 1 FROM domains d WHERE d.domain = c.domain)
+             AND NOT EXISTS (SELECT 1 FROM released_pages r WHERE r.domain = c.domain)
+           ORDER BY ifnull(c.employees, 0) DESC, ifnull(c.revenue, 0) DESC, c.domain`,
+        )
+        .iterate() as IterableIterator<Row>
+      for (const r of rows) yield { domain: r.domain as string, name: r.name as string, employees: r.employees === null ? null : Number(r.employees) }
+    },
+
+    /** Adds domains to the index as one batch; returns the batch number. */
+    releasePages(domains: readonly string[]): number {
+      const batch = Number((db.prepare("SELECT ifnull(max(batch), 0) + 1 AS b FROM released_pages").get() as Row).b)
+      const insert = db.prepare("INSERT OR IGNORE INTO released_pages (domain, batch) VALUES (?, ?)")
+      db.exec("BEGIN")
+      try {
+        for (const d of domains) insert.run(d, batch)
+        db.exec("COMMIT")
+      } catch (error) {
+        db.exec("ROLLBACK")
+        throw error
+      }
+      return batch
     },
 
     close(): void {

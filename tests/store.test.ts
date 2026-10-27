@@ -61,3 +61,33 @@ describe("indexable domains", () => {
     s.close()
   })
 })
+
+describe("released pages", () => {
+  it("offers companies without evidence that take mail, biggest first, and releases them in batches", () => {
+    const s = store()
+    s.upsertDomain({ domain: "known.com", companyName: null, sampleCount: 3, patterns: [{ patternId: "first", weight: 3 }], updatedAt: at })
+    s.upsertMailHosts(
+      [
+        { domain: "known.com", acceptsMail: true, host: null },
+        { domain: "big.com", acceptsMail: true, host: "Microsoft 365" },
+        { domain: "small.com", acceptsMail: true, host: null },
+        { domain: "dead.com", acceptsMail: false, host: null },
+      ],
+      at,
+    )
+    const fact = (domain: string, employees: number | null) => ({
+      domain, rank: 1, name: domain, country: "SE", foundedYear: null, industry: null, legalForm: null, employees,
+      employeesExact: false, revenue: null, currency: null, financialYear: null,
+    })
+    return s.replaceCompanies([fact("known.com", 900), fact("small.com", 5), fact("big.com", 500), fact("dead.com", 800), fact("nomx.com", 1)]).then(() => {
+      expect([...s.releaseCandidates()].map((c) => c.domain)).toEqual(["big.com", "small.com"])
+      expect(s.releasePages(["big.com"])).toBe(1)
+      expect(s.releasePages(["small.com", "dead.com"])).toBe(2)
+      expect(s.isReleased("big.com")).toBe(true)
+      expect([...s.releaseCandidates()]).toEqual([])
+      expect(s.releasedPage(0, 10)).toEqual(["big.com", "small.com"])
+      expect(s.countReleased()).toBe(2)
+      s.close()
+    })
+  })
+})

@@ -6,7 +6,7 @@ import { LikelihoodBar } from "@/components/LikelihoodBar"
 import SectionHeading from "@/components/site/SectionHeading.astro"
 import LinkButton from "@/components/site/LinkButton.astro"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { LOCALES, dictionary, fill, splitPlaceholders, formatNumber, formatPercent, localePath, type Locale } from "@/i18n"
+import { DEFAULT_LOCALE, LOCALES, dictionary, fill, splitPlaceholders, formatNumber, formatPercent, localePath, type Locale } from "@/i18n"
 import Base from "@/layouts/Base.astro"
 import { parseName } from "@/lib/email/names"
 import { applyTemplate, patternById, renameTokens, plainTemplate } from "@/lib/email/patterns"
@@ -71,7 +71,12 @@ const title = known
   : fill(t.domain.metaTitleUnknown, { name })
 const description = known
   ? fill(mixed ? t.domain.metaDescriptionMixed : t.domain.metaDescription, { name, format, share, count, example })
-  : fill(t.domain.metaDescriptionUnknown, { name })
+  : byHost
+    ? fill(t.domain.metaDescriptionHost, { name, format, host: mail.host! })
+    : fill(t.domain.metaDescriptionUnknown, { name })
+// A page with no address evidence is indexed only once released, and then in English only.
+const released = !known && locale === DEFAULT_LOCALE && store.isReleased(domain)
+const indexed = mail.acceptsMail !== false && (known ? record!.sampleCount >= INDEXABLE_MIN_SAMPLES : released)
 
 const companyAnswer = main
   ? [
@@ -137,7 +142,8 @@ const jsonLd = [
   title={title}
   description={description}
   path={path}
-  noindex={!record || record.sampleCount < INDEXABLE_MIN_SAMPLES || mail.acceptsMail === false}
+  noindex={!indexed}
+  languages={known}
   jsonLd={jsonLd}
 >
   <div class="px-2 sm:px-4">

@@ -108,6 +108,7 @@ export const de: Dictionary = {
     metaDescription: "E-Mail-Format von {name}: {format}, genutzt von {share} der {count} Personen, die wir gefunden haben, z. B. {example}. Kostenlos und ohne Anmeldung jede Person dort finden.",
     metaDescriptionMixed: "{name} nutzt mehr als ein E-Mail-Format. Am häufigsten ist {format} ({share} von {count} Personen), z. B. {example}. Kostenlos jede Person dort finden.",
     metaDescriptionUnknown: "Finden Sie das E-Mail-Format und jede Adresse bei {name}.",
+    metaDescriptionHost: "E-Mail-Format von {name}: wahrscheinlich {format}, das häufigste Format bei Firmen, deren E-Mail über {host} läuft. Jede Adresse dort kostenlos finden, ohne Anmeldung.",
     title: "E-Mail-Format von {name}",
     leadKnown: "Bei {company} gilt {template}. Für {person} heißt das {example}.",
     leadMixed: "Bei {company} gibt es mehr als ein Format. Am häufigsten ist {template}, bei {share} der Personen, die wir gesehen haben; für {person} ergibt das {example}.",

@@ -42,16 +42,23 @@ export function toCompanyFact(line: CompanyLine): CompanyFact | null {
   }
 }
 
-/** Loads company facts from JSON Lines, replacing what the store had. */
+/** Loads company facts from JSON Lines, replacing what the store had. Streams, so millions of lines fit. */
 export async function importCompanies(store: Store, path: string): Promise<{ lines: number; companies: number; domains: number }> {
-  const facts: CompanyFact[] = []
   let lines = 0
-  for await (const line of createInterface({ input: createReadStream(path), crlfDelay: Infinity })) {
-    if (!line.trim()) continue
-    lines++
-    const fact = toCompanyFact(JSON.parse(line) as CompanyLine)
-    if (fact) facts.push(fact)
+  let domains = 0
+  let last = ""
+  async function* facts(): AsyncGenerator<CompanyFact> {
+    for await (const line of createInterface({ input: createReadStream(path), crlfDelay: Infinity })) {
+      if (!line.trim()) continue
+      lines++
+      const fact = toCompanyFact(JSON.parse(line) as CompanyLine)
+      if (!fact) continue
+      // Files come sorted by domain, so counting changes counts domains without holding them all.
+      if (fact.domain !== last) domains++
+      last = fact.domain
+      yield fact
+    }
   }
-  const companies = store.replaceCompanies(facts)
-  return { lines, companies, domains: new Set(facts.map((f) => f.domain)).size }
+  const companies = await store.replaceCompanies(facts())
+  return { lines, companies, domains }
 }
