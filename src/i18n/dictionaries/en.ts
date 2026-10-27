@@ -103,13 +103,13 @@ export const en = {
   },
 
   domain: {
-    metaTitle: "{domain} email format: {format} ({share})",
-    metaTitleMixed: "{domain} email formats: {format} ({share}) and others",
-    metaTitleUnknown: "{domain} email format",
+    metaTitle: "{name} email format: {format} ({share})",
+    metaTitleMixed: "{name} email formats: {format} ({share}) and others",
+    metaTitleUnknown: "{name} email format",
     metaDescription: "{name} email format: {format}, used by {share} of the {count} people we found, e.g. {example}. Look up anyone there for free, no sign-up.",
     metaDescriptionMixed: "{name} uses more than one email format. The most common is {format} ({share} of {count} people), e.g. {example}. Look up anyone there for free.",
-    metaDescriptionUnknown: "Find the email format and anyone's address at {domain}.",
-    title: "{domain} email format",
+    metaDescriptionUnknown: "Find the email format and anyone's address at {name}.",
+    title: "{name} email format",
     leadKnown: "People at {company} use {template}. For {person}, that is {example}.",
     leadMixed: "People at {company} use more than one format. The most common is {template}, used by {share} of the people we have seen; for {person}, that gives {example}.",
     leadUnknown: "We haven't seen addresses from {domain} yet. Most companies use one of the formats below.",

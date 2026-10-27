@@ -102,13 +102,13 @@ export const es: Dictionary = {
   },
 
   domain: {
-    metaTitle: "Formato de correo de {domain}: {format} ({share})",
-    metaTitleMixed: "Formatos de correo de {domain}: {format} ({share}) y otros",
-    metaTitleUnknown: "Formato de correo de {domain}",
+    metaTitle: "Formato de correo de {name}: {format} ({share})",
+    metaTitleMixed: "Formatos de correo de {name}: {format} ({share}) y otros",
+    metaTitleUnknown: "Formato de correo de {name}",
     metaDescription: "Formato de correo de {name}: {format}, usado por el {share} de las {count} personas encontradas, p. ej. {example}. Busca a cualquiera gratis, sin registro.",
     metaDescriptionMixed: "{name} usa más de un formato de correo. El más común es {format} ({share} de {count} personas), p. ej. {example}. Busca a cualquiera gratis.",
-    metaDescriptionUnknown: "Encuentra el formato de correo y la dirección de cualquiera en {domain}.",
-    title: "Formato de correo de {domain}",
+    metaDescriptionUnknown: "Encuentra el formato de correo y la dirección de cualquiera en {name}.",
+    title: "Formato de correo de {name}",
     leadKnown: "En {company} usan {template}. Para {person}, eso es {example}.",
     leadMixed: "En {company} se usa más de un formato. El más común es {template}, que usa el {share} de las personas que hemos visto; para {person}, eso da {example}.",
     leadUnknown: "Aún no hemos visto direcciones de {domain}. La mayoría de empresas usa uno de los formatos de abajo.",

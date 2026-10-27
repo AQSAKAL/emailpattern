@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { displayCompanyName, splitIndustry } from "../src/lib/company-name"
+import { displayCompanyName, searchName, splitIndustry } from "../src/lib/company-name"
 
 describe("displayCompanyName", () => {
   it("keeps a real name", () => {
@@ -12,6 +12,29 @@ describe("displayCompanyName", () => {
     expect(displayCompanyName("  ", "x.com")).toBeNull()
     expect(displayCompanyName(null, "x.com")).toBeNull()
     expect(displayCompanyName("acme.co", "acme.co")).toBeNull()
+  })
+})
+
+describe("searchName", () => {
+  it("drops legal forms and recases all-caps names", () => {
+    expect(searchName("Dynamant AB", "dynamant.se")).toBe("Dynamant")
+    expect(searchName("BYÅSEN TREVARE AS", "byasentrevare.no")).toBe("Byåsen Trevare")
+    expect(searchName("Linné Travel Service Aktiebolag", "linnetravel.se")).toBe("Linné Travel Service")
+    expect(searchName("lambda9 GmbH", "lambda9.de")).toBe("lambda9")
+    expect(searchName('Sabiedrība ar ierobežotu atbildību "ASILEKS"', "asileks.com")).toBe("Asileks")
+    expect(searchName("IKEA", "ikea.com")).toBe("IKEA")
+  })
+
+  it("leaves out registry names that are another company's", () => {
+    expect(searchName("Porin Talousneliöt Oy", "pori.fi")).toBeNull()
+    expect(searchName("Peter Flygts Gräv & Transport Aktiebolag", "flygts.se")).toBeNull()
+    expect(searchName("Remolino OÜ", "arteflamenco.ee")).toBeNull()
+  })
+
+  it("trusts names stored with the company's own addresses", () => {
+    expect(searchName("Capgemini", "capgemini.com", true)).toBe("Capgemini")
+    expect(searchName("LEO Pharma A/S", "leo-pharma.com", true)).toBe("LEO Pharma")
+    expect(searchName(null, "nhs.net", true)).toBeNull()
   })
 })
 

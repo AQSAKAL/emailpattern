@@ -102,13 +102,13 @@ export const fr: Dictionary = {
   },
 
   domain: {
-    metaTitle: "Format e-mail de {domain} : {format} ({share})",
-    metaTitleMixed: "Formats e-mail de {domain} : {format} ({share}) et d'autres",
-    metaTitleUnknown: "Format e-mail de {domain}",
+    metaTitle: "Format e-mail de {name} : {format} ({share})",
+    metaTitleMixed: "Formats e-mail de {name} : {format} ({share}) et d'autres",
+    metaTitleUnknown: "Format e-mail de {name}",
     metaDescription: "Format e-mail de {name} : {format}, utilisé par {share} des {count} personnes trouvées, par ex. {example}. Trouvez n'importe qui gratuitement, sans inscription.",
     metaDescriptionMixed: "{name} utilise plus d'un format d'e-mail. Le plus courant est {format} ({share} de {count} personnes), par ex. {example}. Trouvez n'importe qui gratuitement.",
-    metaDescriptionUnknown: "Trouvez le format e-mail et l'adresse de n'importe qui chez {domain}.",
-    title: "Format e-mail de {domain}",
+    metaDescriptionUnknown: "Trouvez le format e-mail et l'adresse de n'importe qui chez {name}.",
+    title: "Format e-mail de {name}",
     leadKnown: "Chez {company}, le format est {template}. Pour {person}, cela donne {example}.",
     leadMixed: "Chez {company}, il existe plus d'un format. Le plus courant est {template}, utilisé par {share} des personnes que nous avons vues ; pour {person}, cela donne {example}.",
     leadUnknown: "Nous n'avons pas encore vu d'adresses de {domain}. La plupart des entreprises utilisent l'un des formats ci-dessous.",

@@ -12,6 +12,48 @@ export function displayCompanyName(name: string | null | undefined, domain: stri
   return trimmed
 }
 
+// Legal forms people leave out when they search for a company, in the countries we cover.
+const LEGAL_FORMS = [
+  "aktiebolag", "aktiebolaget", "ab \\(publ\\)", "ab", "asa", "as", "a/s", "aps", "ivs", "k/s", "p/s", "oy", "oyj", "ab oy",
+  "hf", "ehf", "oü", "aas", "uab", "sia", "s\\.r\\.o\\.", "spol\\. s r\\.o\\.", "a\\.s\\.", "sp\\. z o\\.o\\.", "s\\.a\\.", "sa",
+  "gmbh & co\\. kg", "gmbh", "ag", "kg", "se", "plc", "ltd\\.?", "limited", "llc", "inc\\.?", "corp\\.?", "corporation",
+  "co\\.", "b\\.v\\.", "bv", "n\\.v\\.", "nv", "sas", "sarl", "s\\.a\\.s\\.", "s\\.p\\.a\\.", "spa", "srl", "s\\.r\\.l\\.",
+  "s\\.l\\.", "sl", "kft\\.?", "zrt\\.?", "nyrt\\.?", "d\\.o\\.o\\.", "d\\.d\\.", "ad", "eood", "ood",
+  "sabiedrība ar ierobežotu atbildību", "akciju sabiedrība", "osaühing", "aktsiaselts",
+].join("|")
+const LEADING_FORM = new RegExp(`^(${LEGAL_FORMS})\\s+`, "i")
+const TRAILING_FORM = new RegExp(`[\\s,]+(${LEGAL_FORMS})$`, "i")
+
+/** Letters and digits only, lower case and without accents, for comparing names with domains. */
+function compact(text: string): string {
+  return text.normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "")
+}
+
+/** "NOVO NORDISK" reads "Novo Nordisk"; short all-caps words (IKEA, NHS) stay as acronyms. */
+function recase(name: string): string {
+  if (name !== name.toUpperCase() || name === name.toLowerCase()) return name
+  return name.replace(/\p{L}+/gu, (word) => (word.length > 4 ? word[0] + word.slice(1).toLowerCase() : word))
+}
+
+/**
+ * The name people search for a company by, or null to use the domain. Legal forms are dropped and
+ * all-caps names recased. A registry name counts only when it matches the domain (registers list
+ * whoever gave the website, which is sometimes another company); a name we stored with the
+ * company's own addresses is trusted.
+ */
+export function searchName(name: string | null | undefined, domain: string, trusted = false): string | null {
+  let text = name?.trim().replace(/^["“]|["”]$/g, "").replace(/\s+/g, " ")
+  if (!text) return null
+  for (let i = 0; i < 3; i++) text = text.replace(LEADING_FORM, "").replace(TRAILING_FORM, "").replace(/^["“]|["”]$/g, "").trim()
+  const shown = displayCompanyName(recase(text), domain)
+  if (!shown || trusted) return shown
+  const label = compact(domain.split(".")[0])
+  const plain = compact(shown)
+  if (label.length < 3 || plain.length < 3) return null
+  const matches = (plain.startsWith(label) && label.length >= plain.length / 2) || (label.startsWith(plain) && plain.length >= label.length / 2)
+  return matches ? shown : null
+}
+
 const MAX_INDUSTRY_LENGTH = 70
 
 /**

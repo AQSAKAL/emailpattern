@@ -13,7 +13,7 @@ import { applyTemplate, patternById, renameTokens, plainTemplate } from "@/lib/e
 import { INDEXABLE_MIN_SAMPLES, getStore } from "@/server/db"
 import { domainContext } from "@/server/find"
 import { rankCandidates, isMixedEvidence } from "@/lib/email/candidates"
-import { displayCompanyName, splitIndustry } from "@/lib/company-name"
+import { displayCompanyName, searchName, splitIndustry } from "@/lib/company-name"
 import { countryName, formatMoney } from "@/i18n/format"
 
 interface Props {
@@ -62,15 +62,16 @@ const facts = main
 const similar = industry.label ? store.similarDomains(main!.industry!, main!.country, domain, INDEXABLE_MIN_SAMPLES, 12) : []
 
 const format = `${plainTemplate(topTemplate, t.titleTokens)}@${domain}`
-const shownName = displayCompanyName(record?.companyName ?? main?.name, domain)
-const name = shownName ? `${shownName} (${domain})` : domain
+// People search by company name ("NHS email format"), so titles lead with it when we have one.
+const brand = searchName(record?.companyName, domain, true) ?? searchName(main?.name, domain)
+const name = brand ? `${brand} (${domain})` : domain
 const count = formatNumber(locale, record?.sampleCount ?? 0)
 const title = known
-  ? fill(mixed ? t.domain.metaTitleMixed : t.domain.metaTitle, { domain, format, share })
-  : fill(t.domain.metaTitleUnknown, { domain })
+  ? fill(mixed ? t.domain.metaTitleMixed : t.domain.metaTitle, { name: brand ?? domain, format, share })
+  : fill(t.domain.metaTitleUnknown, { name })
 const description = known
   ? fill(mixed ? t.domain.metaDescriptionMixed : t.domain.metaDescription, { name, format, share, count, example })
-  : fill(t.domain.metaDescriptionUnknown, { domain })
+  : fill(t.domain.metaDescriptionUnknown, { name })
 
 const companyAnswer = main
   ? [
@@ -149,7 +150,7 @@ const jsonLd = [
         <span>{domain}</span>
       </nav>
       <h1 class="text-4xl font-semibold tracking-tight break-words sm:text-5xl">
-        {fill(t.domain.title, { domain })}
+        {fill(t.domain.title, { name })}
       </h1>
       <p class="max-w-3xl text-lg leading-relaxed">
         {known ? (
