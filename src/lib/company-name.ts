@@ -26,7 +26,7 @@ const TRAILING_FORM = new RegExp(`[\\s,]+(${LEGAL_FORMS})$`, "i")
 
 /** Letters and digits only, lower case and without accents, for comparing names with domains. */
 function compact(text: string): string {
-  return text.normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "")
+  return text.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "")
 }
 
 /**
