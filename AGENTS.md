@@ -32,7 +32,7 @@ company's email format and the likely address. Same answers over a REST API and 
 - Say that the site, API and MCP are free; the copy lives in the dictionaries.
 - Keep calculations pure and tested; effects (DB, DNS, fetch) stay in `src/server/`.
 - Store only each domain's pattern weights, never the sample addresses.
-- Domain pages with fewer than `INDEXABLE_MIN_SAMPLES` people are `noindex` and left out of sitemaps.
+- Domain pages with fewer than `INDEXABLE_MIN_SAMPLES` people, or whose domain takes no mail, are `noindex` and left out of sitemaps.
 - In `.astro` files, React components take `className`, plain HTML takes `class`.
 
 ## Usage data

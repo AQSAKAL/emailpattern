@@ -22,8 +22,11 @@ export async function getStore(): Promise<Store> {
   return store
 }
 
-/** Domains need this many matched people before their page is indexed. Thinner pages stay noindex. */
-export const INDEXABLE_MIN_SAMPLES = 3
+/**
+ * Domains need this many matched people before their page is indexed. One real address is proof
+ * enough; pages with no evidence (a guess from the mail host alone) stay noindex.
+ */
+export const INDEXABLE_MIN_SAMPLES = 1
 
 const MIX_TTL_MS = 10 * 60 * 1000
 let mix: { value: PatternMix; at: number } | null = null
