@@ -7,6 +7,8 @@ describe("pickRelease", () => {
     const candidates = [
       { domain: "gmail.com", name: "Gmail AB", employees: 9000 },
       { domain: "pori.fi", name: "Porin Talousneliöt Oy", employees: 800 },
+      { domain: "pomona.edu", name: "POMONA", employees: 5000 },
+      { domain: "oxford.ac.uk", name: "Oxford Ltd", employees: 600 },
       { domain: "dynamant.se", name: "Dynamant AB", employees: 50 },
       { domain: "enkon.se", name: "Enkon AB", employees: 20 },
       { domain: "lambda9.de", name: "lambda9 GmbH", employees: 10 },
